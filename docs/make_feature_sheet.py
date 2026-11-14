@@ -1,4 +1,4 @@
-"""Feature sheet, 2 A4 pages, in Thai and English from one layout.
+"""Feature sheet, 3 A4 pages (the last one: screenshots from docs/screenshots), in Thai and English from one layout.
 
   python docs/make_feature_sheet.py          -> docs/feature-sheet-th.html/.pdf, docs/feature-sheet-en.html/.pdf
 PDF is printed with headless Microsoft Edge (commission.to_pdf). Edit the texts below, then run again.
@@ -93,6 +93,12 @@ T = {
                  ("6", "Export", "keep sending data to MQTT / SQLite")],
         "foot_l": "mbtool · built from the public Modbus specification", "foot_r": "mbtool-cli.exe --help",
         "page": "Page",
+        "s4": "Screenshots",
+        "shots": [("main", "Main window", "Live register table: every register as several data types side by side"),
+                  ("devices", "Devices", "Five devices on one RS-485 line, one tab each, error types and response times"),
+                  ("health", "Bus health test", "Real response times per device, recommended timeout and gap, expected cycle"),
+                  ("busmap", "RS-485 bus map", "Cable lengths, terminators and a request travelling to a device and back")],
+        "shots_note": "Captured from mbtool with the built-in demo devices (simulated, no hardware).",
     },
     "th": {
         "lang": "th", "title": "mbtool - Feature Sheet",
@@ -169,6 +175,12 @@ T = {
                  ("6", "ส่งข้อมูลออก", "ส่งค่าต่อเนื่องไป MQTT / SQLite")],
         "foot_l": "mbtool · พัฒนาจากข้อกำหนดสาธารณะของ Modbus", "foot_r": "mbtool-cli.exe --help",
         "page": "หน้า",
+        "s4": "ภาพหน้าจอโปรแกรม",
+        "shots": [("main", "หน้าต่างหลัก", "ตารางค่าแบบเรียลไทม์ แสดงทุก register เป็นหลายชนิดข้อมูลพร้อมกัน"),
+                  ("devices", "หน้าต่าง Devices", "5 อุปกรณ์บนสาย RS-485 เส้นเดียว แยกแท็บละตัว พร้อมชนิด error และเวลาตอบ"),
+                  ("health", "ทดสอบสุขภาพบัส", "เวลาตอบจริงของแต่ละอุปกรณ์ ค่า timeout / gap ที่แนะนำ และเวลารอบที่คาด"),
+                  ("busmap", "แผนผังบัส RS-485", "ความยาวสาย terminator และภาพคำขอวิ่งไปหาอุปกรณ์แล้วตอบกลับ")],
+        "shots_note": "ถ่ายจาก mbtool โดยใช้ Demo devices ที่มีในโปรแกรม (อุปกรณ์จำลอง ไม่ต้องมีฮาร์ดแวร์)",
     },
 }
 
@@ -209,6 +221,13 @@ code { font-family:Consolas,monospace; font-size:8pt; }
 .step { border:1px solid var(--line); border-top:3px solid var(--blue); border-radius:2mm; padding:2.4mm 2.4mm; font-size:8.3pt; line-height:1.4; }
 .step b { display:block; font-size:9.6pt; margin-bottom:.8mm; }
 .step i { font-style:normal; color:var(--blue); font-weight:700; margin-right:1mm; }
+.shots { display:flex; flex-direction:column; gap:3mm; }
+.shot { display:grid; grid-template-columns:112mm 1fr; gap:4mm; align-items:center; border:1px solid var(--line);
+        border-radius:2.5mm; padding:2.5mm 3.5mm 2.5mm 2.5mm; background:#fff; }
+.shot img { width:112mm; max-height:55mm; object-fit:contain; object-position:left center; display:block;
+            border:1px solid var(--line); border-radius:1.5mm; }
+.shot h2 { margin:0 0 1.4mm; font-size:11pt; color:var(--blue); }
+.shot p { margin:0; font-size:9pt; line-height:1.5; color:var(--ink); }
 footer { margin-top:auto; display:flex; justify-content:space-between; font-size:8pt; color:var(--mute);
          border-top:1px solid var(--line); padding-top:2mm; }
 @media screen { body { background:#e9ecf1; } .page { margin:8mm auto; background:#fff; box-shadow:0 2px 14px #0003; } }
@@ -233,7 +252,7 @@ def render(t):
             f'<p>{e(t["tag"])} &nbsp;|&nbsp; {e(t["ver"])} &nbsp;|&nbsp; {e(t["os"])}</p></div></header>')
 
     def foot(n):
-        return f'<footer><span>{e(t["foot_l"])}</span><span>{e(t["foot_r"])} &nbsp;·&nbsp; {e(t["page"])} {n}/2</span></footer>'
+        return f'<footer><span>{e(t["foot_l"])}</span><span>{e(t["foot_r"])} &nbsp;·&nbsp; {e(t["page"])} {n}/3</span></footer>'
     ai = (f'<div class="card"><h3>{e(t["ai_h"])}</h3><table><tr><th>{e(t["ai_th"][0])}</th><th>{e(t["ai_th"][1])}</th></tr>'
           + "".join(f"<tr><td>{e(a)}</td><td>{e(b)}</td></tr>" for a, b in t["ai_rows"])
           + f'</table><p class="note">{e(t["ai_note"])}</p></div>')
@@ -247,9 +266,21 @@ def render(t):
         f'<div class="step"><b><i>{e(n)}</i>{e(h)}</b>{e(d)}</div>' for n, h, d in t["flow"]) + "</div>")
     p2 = (f'<div class="page"><div class="sec">{e(t["s3"])}</div>{cards(t["cards3"])}'
           f'{ai}{flow}{keys}{inst}{foot(2)}</div>')
+    shots = '<div class="shots">' + "".join(
+        f'<div class="shot"><img src="{img_uri(f)}" alt="{e(h)}"><div><h2>{e(h)}</h2><p>{e(d)}</p></div></div>'
+        for f, h, d in t["shots"]) + "</div>"
+    p3 = (f'<div class="page"><div class="sec">{e(t["s4"])}</div>{shots}'
+          f'<p class="note">{e(t["shots_note"])}</p>{foot(3)}</div>')
     return (f'<!doctype html><html lang="{t["lang"]}"><head><meta charset="utf-8">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1"><title>{e(t["title"])}</title>'
-            f'<style>{CSS}</style></head><body>{p1}{p2}</body></html>')
+            f'<style>{CSS}</style></head><body>{p1}{p2}{p3}</body></html>')
+
+
+def img_uri(name):
+    """docs/screenshots/<name>.png as a data: URI, so the HTML sheet is one self-contained file."""
+    import base64
+    with open(os.path.join(HERE, "screenshots", name + ".png"), "rb") as f:
+        return "data:image/png;base64," + base64.b64encode(f.read()).decode("ascii")
 
 
 def main():
