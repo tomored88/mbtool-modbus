@@ -293,20 +293,22 @@ class SerialMaster(Master):
                 self._timed_out = True
             raise
         finally:
-            self._last_activity = time.monotonic()  # end of the previous frame, for the t3.5 gap
+            # end of the previous frame, for the t3.5 gap. perf_counter: time.monotonic() on Windows ticks only every
+            # ~15.6 ms before Python 3.13, far coarser than a t3.5 of 1.75-4 ms
+            self._last_activity = time.perf_counter()
 
     late_guard = 0.15  # s: after a timeout, wait this long for a late answer and discard it (RTU has no ID)
 
     def _drain_late(self):
         """A device that answers after our timeout would otherwise have its late answer taken as the reply to the
         NEXT request (RTU frames carry no transaction ID). Wait for the line to stay quiet before sending again."""
-        end = time.monotonic() + self.late_guard
+        end = time.perf_counter() + self.late_guard
         quiet = max(0.02, 3 * self.t35)
         saved = self.ser.timeout
         try:
             self.ser.timeout = quiet
-            while time.monotonic() < end:
-                if not self.ser.read(256) and time.monotonic() + quiet > end:
+            while time.perf_counter() < end:
+                if not self.ser.read(256) and time.perf_counter() + quiet > end:
                     break
         finally:
             self.ser.timeout = saved
@@ -317,7 +319,7 @@ class SerialMaster(Master):
             self._timed_out = False
             self._drain_late()
         if self.mode == "rtu":
-            idle = time.monotonic() - getattr(self, "_last_activity", 0.0)
+            idle = time.perf_counter() - getattr(self, "_last_activity", 0.0)
             if idle < self.t35:  # RTU requires >= 3.5 character times of silence between frames
                 time.sleep(self.t35 - idle)
         self.ser.reset_input_buffer()

@@ -1421,7 +1421,9 @@ class MultiPoller:
     every TCP device has its own worker, workers run in parallel. Each device start gets a new generation number:
     results carry it and stale ones are dropped with accept()."""
 
-    def __init__(self, factory, emit, gap_s=0.05, retry_s=2.0, clock=time.monotonic):
+    def __init__(self, factory, emit, gap_s=0.05, retry_s=2.0, clock=time.perf_counter):
+        # clock: perf_counter, because the bus gap is a few ms and time.monotonic() on Windows ticks only every
+        # ~15.6 ms before Python 3.13
         self.factory, self.emit = factory, emit
         self.gap_s, self.retry_s, self.clock = gap_s, retry_s, clock
         self.lock = threading.Lock()
