@@ -1249,6 +1249,21 @@ class BusWorker(threading.Thread):
             self.conn_err = str(e) or repr(e)
             return self.conn_err
 
+    SETTLE_STEP_S, SETTLE_MAX_S = 0.03, 0.25
+
+    def _settle(self):
+        """'Start all' adds the devices of a bus one by one; wait until the list stops growing (30 ms steps,
+        at most 0.25 s) so the first cycle - and its statistics - covers all of them, not just the first device."""
+        end = time.perf_counter() + self.SETTLE_MAX_S
+        seen = -1
+        while not self.halt and time.perf_counter() < end:
+            with self.poller.lock:
+                n = len(self.slots)
+            if n == seen:
+                return
+            seen = n
+            self._fine_sleep(self.SETTLE_STEP_S)
+
     def _run_cycle(self):
         """Round robin like a PLC task: read every device of this bus in order (all its blocks), one request after
         the other, then the cycle ends; with a target the next cycle starts target ms after this one started
@@ -1256,6 +1271,7 @@ class BusWorker(threading.Thread):
         p = self.poller
         kind = self.conn["mode"].lower() if self.conn["mode"] != "TCP" else "tcp"
         tm = TimedMaster(None, p.gap_s, kind, sleep=self._fine_sleep, halted=lambda: self.halt)
+        self._settle()
         while not self.halt:
             with p.lock:
                 slots = list(self.slots)

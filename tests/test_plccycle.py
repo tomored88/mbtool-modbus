@@ -207,6 +207,23 @@ class Worker(unittest.TestCase):
             w.join(2)
         return log, msgs
 
+    def test_first_cycle_covers_devices_started_together(self):
+        """'Start all' adds devices one by one; the first cycle must not run with only the first of them
+        (that showed up as reads 1, 1, 2, 3 ... and skewed the cycle statistics)."""
+        log, msgs = [], []
+        p = M.MultiPoller(lambda c: FakeMaster(log), msgs.append, gap_s=0.0)
+        p.mode, p.target_s = "cycle", None
+        for i, d in enumerate([self.dev("A", 1), self.dev("B", 2), self.dev("C", 3)]):
+            p.start_device(d, M.make_reader(d))
+            time.sleep(0.01)  # a slow 'Start all': the worker is already running when B and C arrive
+        time.sleep(0.4)
+        for w in p.stop_all():
+            w.join(2)
+        units = [u for _t, u, _a in log]
+        self.assertEqual(units[:6], [1, 2, 3, 1, 2, 3], units[:9])
+        first = next(m for m in msgs if m[0] == "cycle")[4]
+        self.assertEqual([d["name"] for d in first["devices"]], ["A", "B", "C"])
+
     def test_round_robin_order_and_stats(self):
         devs = [self.dev("A", 1), self.dev("B", 2), self.dev("C", 3)]
         log, msgs = self.run_poller(devs, 0.35)
