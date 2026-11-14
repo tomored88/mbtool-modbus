@@ -124,6 +124,25 @@ class HttpServer(unittest.TestCase):
         finally:
             srv.stop()
 
+    def test_error_replies_arrive_even_with_a_large_body(self):
+        """401 / 429 must reach the client as HTTP answers, never as a connection reset (the server has to read
+        the request body before it answers early; on Windows unread data turns the close into a reset)."""
+        srv = M.BackgroundServer("127.0.0.1", self.port, TOKEN, self.audit)
+        try:
+            codes = []
+            for _ in range(30):
+                req = urllib.request.Request(f"http://127.0.0.1:{self.port}/mcp", data=b"x" * 300_000, method="POST",
+                                             headers={"Content-Type": "application/json",
+                                                      "Authorization": "Bearer bad"})
+                try:
+                    codes.append(urllib.request.urlopen(req, timeout=5).status)
+                except urllib.error.HTTPError as e:
+                    codes.append(e.code)
+            self.assertEqual(set(codes), {401, 429}, codes)
+            self.assertEqual(codes.count(401), 10)
+        finally:
+            srv.stop()
+
     def test_busy_port_raises_oserror(self):
         a = M.BackgroundServer("127.0.0.1", self.port, TOKEN, self.audit)
         try:

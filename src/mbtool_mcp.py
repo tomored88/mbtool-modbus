@@ -712,6 +712,18 @@ def _make_guard(app, token, audit_path, rate_per_s=20.0, max_body=1_000_000):
                                 *extra]})
         await send({"type": "http.response.body", "body": body})
 
+    async def drain(receive):
+        """Read and drop the request body before an early error answer. Closing a connection with unread data
+        makes Windows send a reset, and the client then sees 'connection aborted' instead of the 401 / 429."""
+        size = 0
+        while size <= max_body:
+            msg = await receive()
+            if msg["type"] == "http.disconnect":
+                return
+            size += len(msg.get("body", b""))
+            if not msg.get("more_body"):
+                return
+
     async def guard(scope, receive, send):
         if scope["type"] != "http":
             return await app(scope, receive, send)
@@ -721,17 +733,20 @@ def _make_guard(app, token, audit_path, rate_per_s=20.0, max_body=1_000_000):
         while f and now - f[0] > 60:
             f.popleft()
         if len(f) >= 10:
+            await drain(receive)
             return await reply(send, 429, "too many failed attempts; wait a minute")
         auth = dict(scope["headers"]).get(b"authorization", b"").decode("latin-1")
         if not (auth.startswith("Bearer ") and hmac.compare_digest(auth[7:].encode(), token.encode())):
             f.append(now)
             STATS["auth_failed"] += 1
             audit(ip, "auth_failed", path=scope.get("path"))
+            await drain(receive)
             return await reply(send, 401, "missing or wrong bearer token", [(b"www-authenticate", b"Bearer")])
         h = hits[ip]
         while h and now - h[0] > 1.0:
             h.popleft()
         if len(h) >= rate_per_s:
+            await drain(receive)
             return await reply(send, 429, "rate limit exceeded")
         h.append(now)
         STATS["requests"] += 1
