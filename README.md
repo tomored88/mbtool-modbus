@@ -19,6 +19,34 @@ the first time: **More info > Run anyway**. After installing, `mbtool-cli.exe se
 Feature sheet: [English](docs/feature-sheet-en.pdf) · [ไทย](docs/feature-sheet-th.pdf) &nbsp;|&nbsp;
 Manual: built in (press **F1**, Thai and English)
 
+### Windows says the program is unsafe?
+
+mbtool is new and not code-signed, so Windows has no reputation for it yet:
+
+- **"Windows protected your PC" (SmartScreen):** click **More info**, then **Run anyway**. This appears once.
+- **Microsoft Defender says it found a threat:** programs packed with PyInstaller are sometimes flagged by mistake.
+  Compare the file's SHA-256 with the one in the [release notes](https://github.com/tomored88/mbtool-modbus/releases/latest) (PowerShell: `Get-FileHash mbtool-setup.exe`),
+  or run from source instead (`install.bat`, then `run.bat`). Please report it in Issues so it can be submitted to
+  Microsoft as a false positive.
+
+## Screenshots
+
+**Main window** - live register table, every register shown as several data types side by side
+
+![Main window](docs/screenshots/main.png)
+
+**Devices** - several devices on one RS-485 line, each with its own tab, error types and response times
+
+![Devices window](docs/screenshots/devices.png)
+
+**Bus health test** - real response times per device, recommended timeout and gap, expected PLC cycle
+
+![Bus health test](docs/screenshots/health.png)
+
+**RS-485 bus map** - cable lengths, terminators and a request travelling to a device and back
+
+![Bus map](docs/screenshots/busmap.png)
+
 ## What is in this repository
 
 | Folder / file | Contents |
