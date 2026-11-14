@@ -387,13 +387,13 @@ class FakeMaster:
             self.wire.overlap = True
             self.wire.lock.acquire()
         try:
-            t0 = time.monotonic()
+            t0 = time.perf_counter()
             if unit in self.dead:
                 time.sleep(0.15)  # timeout
-                self.wire.log.append((t0, time.monotonic(), self.name, unit, False))
+                self.wire.log.append((t0, time.perf_counter(), self.name, unit, False))
                 raise ModbusError("response timeout")
             time.sleep(self.delay)
-            self.wire.log.append((t0, time.monotonic(), self.name, unit, True))
+            self.wire.log.append((t0, time.perf_counter(), self.name, unit, True))
             return [unit * 100 + i for i in range(qty)]
         finally:
             self.wire.lock.release()
