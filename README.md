@@ -11,13 +11,13 @@ with an MCP server so AI assistants can help. Free and open source (MIT).
 |---|---|
 | **Install it** (Start menu shortcut, uninstall from Apps & features, no admin rights) | [**mbtool-setup.exe**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-setup.exe) |
 | **Run it without installing** (unzip anywhere, e.g. a USB stick) | [**mbtool-portable.zip**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-portable.zip) |
+| **Read what it can do first** (feature sheet, 3 pages with screenshots, PDF) | [**English**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-en.pdf) · [**ไทย**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-th.pdf) |
 
 All versions and release notes: [Releases](https://github.com/tomored88/mbtool-modbus/releases/latest). The program is not code-signed, so Windows SmartScreen may warn
 the first time: **More info > Run anyway**. After installing, `mbtool-cli.exe selftest` checks it on your PC in about
 15 seconds, no hardware needed.
 
-Feature sheet: [English](docs/feature-sheet-en.pdf) · [ไทย](docs/feature-sheet-th.pdf) &nbsp;|&nbsp;
-Manual: built in (press **F1**, Thai and English)
+Manual: built in (press **F1**, Thai and English).
 
 ### Windows says the program is unsafe?
 
@@ -60,6 +60,9 @@ mbtool is new and not code-signed, so Windows has no reputation for it yet:
 | `run.bat`, `install.bat` | run from source with Python (developers) |
 
 ## Features
+
+Overview on 3 pages with screenshots: [feature sheet (English)](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-en.pdf) · [ไทย](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-th.pdf)
+
 
 - **Master:** Modbus/TCP, RTU, ASCII; function codes 01-06, 15, 16, 22, 23; 10 display formats.
 - **GUI** (tkinter): poll tabs (several polls open at once in the main window, like several poll windows: own
@@ -199,6 +202,8 @@ python tests/test_help.py ; python tests/test_aiassist.py ; python tests/test_he
 ## สรุปภาษาไทย
 
 **ดาวน์โหลด:** ต้องการติดตั้ง ใช้ [mbtool-setup.exe](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-setup.exe) ถ้าไม่อยากติดตั้ง ใช้ [mbtool-portable.zip](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-portable.zip) แตกไฟล์แล้วรัน `mbtool.exe` ได้เลย ไฟล์อื่นใน repo นี้เป็นโค้ด ไม่ต้องโหลด
+
+**เอกสารแนะนำโปรแกรม (feature sheet):** [ภาษาไทย](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-th.pdf) · [English](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-en.pdf) (PDF 3 หน้า มีภาพหน้าจอ)
 
 เครื่องมือ Modbus: master (TCP/RTU/ASCII), หน้าต่าง GUI, simulator ของ slave, preset ของอุปกรณ์ 30 รุ่น,
 สแกนค่าการเชื่อมต่ออัตโนมัติ, Test Center และ MCP server ให้ AI อ่านค่าอุปกรณ์
