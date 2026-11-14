@@ -1,5 +1,8 @@
 # mbtool - Modbus master, slave simulator and RS-485 bus design tool
 
+[![tests](https://github.com/tomored88/mbtool-modbus/actions/workflows/tests.yml/badge.svg)](https://github.com/tomored88/mbtool-modbus/actions/workflows/tests.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Read, write, simulate and analyse Modbus devices (TCP / RTU / ASCII) and design the RS-485 bus - one Windows program,
 with an MCP server so AI assistants can help. Free and open source (MIT).
 
@@ -58,6 +61,7 @@ mbtool is new and not code-signed, so Windows has no reputation for it yet:
 | `tests/` | automated tests (`python -m pytest tests`) |
 | `packaging/` | build scripts for the .exe, installer and portable zip (`packaging\build_exe.bat`) |
 | `run.bat`, `install.bat` | run from source with Python (developers) |
+| `CONTRIBUTING.md`, `docs/ARCHITECTURE.md` | how to help, and a map of the code for developers |
 
 ## Features
 
@@ -253,6 +257,10 @@ Microsoft Defender แล้ว) กด **More info** แล้วกด **Run a
 - MCP ปิดการเขียนค่าเป็นค่าเริ่มต้น เปิดได้ด้วยตัวแปร `MBTOOL_ALLOW_WRITE=1` และระบุช่วง address ที่อนุญาตเท่านั้น
 - รันจากโค้ด (สำหรับนักพัฒนา): ดับเบิลคลิก `install.bat` แล้วเปิดด้วย `run.bat` (ต้องมี Python 3.10 ขึ้นไป)
 - ทดสอบ RTU โดยไม่มีฮาร์ดแวร์ได้ด้วย `python src/mbtool.py vcom` (สายจำลองผ่าน TCP)
+
+## Contributing
+
+Bug reports, presets checked on real devices, translations and pull requests are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md) and the code map in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Every pull request is tested automatically on Windows.
 
 ## License
 
