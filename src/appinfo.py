@@ -13,7 +13,7 @@ import traceback
 
 APP_NAME = "mbtool"
 APP_TITLE = "mbtool - Modbus master & simulator"
-VERSION = "1.1.2"
+VERSION = "1.1.3"
 FROZEN = bool(getattr(sys, "frozen", False))
 # Portable build: a file named "portable.txt" next to mbtool.exe keeps settings, presets and logs in .\data
 PORTABLE = FROZEN and os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(sys.executable)), "portable.txt"))
