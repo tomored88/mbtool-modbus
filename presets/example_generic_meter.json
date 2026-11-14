@@ -1,0 +1,20 @@
+{
+  "name": "Example generic energy meter",
+  "manufacturer": "ILLUSTRATIVE ONLY",
+  "model": "not a real model - copy this file and replace with the register map from your device manual",
+  "verified": false,
+  "connection": {"type": "tcp", "host": "127.0.0.1", "port": 5020, "unit": 1, "timeout": 1.0},
+  "address_base": 0,
+  "points": [
+    {"name": "Voltage L1", "address": 0, "fc": 3, "type": "float32", "unit": "V", "group": "measure", "sim": 230.4},
+    {"name": "Current L1", "address": 2, "fc": 3, "type": "float32", "unit": "A", "group": "measure", "sim": 12.5},
+    {"name": "Power", "address": 4, "fc": 3, "type": "int16", "scale": 10, "unit": "W", "group": "measure", "sim": 2880},
+    {"name": "Temperature", "address": 5, "fc": 3, "type": "int16", "scale": 0.1, "unit": "C", "group": "measure", "sim": 25.3},
+    {"name": "Energy", "address": 6, "fc": 3, "type": "uint32", "word_order": "little", "scale": 0.01, "unit": "kWh", "group": "measure", "sim": 12345.67},
+    {"name": "Mode", "address": 10, "fc": 3, "type": "uint16", "access": "rw", "min": 0, "max": 2, "group": "config",
+     "enum": {"0": "Stop", "1": "Run", "2": "Standby"}, "sim": 1},
+    {"name": "Setpoint", "address": 11, "fc": 3, "type": "int16", "scale": 0.1, "unit": "C", "access": "rw", "min": 5, "max": 40, "group": "config", "sim": 22.0},
+    {"name": "Relay", "address": 0, "fc": 1, "type": "bool", "access": "rw", "group": "config", "enum": {"0": "Open", "1": "Closed"}},
+    {"name": "Alarm", "address": 0, "fc": 2, "type": "bool", "group": "status", "enum": {"0": "OK", "1": "ALARM"}}
+  ]
+}

@@ -1,0 +1,548 @@
+{
+  "name": "Autonics TK series PID temperature controller (TK4S)",
+  "manufacturer": "Autonics",
+  "model": "TK4S (TK Series)",
+  "source": [
+    "https://cdn.automationdirect.com/static/manuals/autonics/autonicstkcommunicationsmanual.pdf"
+  ],
+  "doc_revision": "TK Series Simultaneous Heating&Cooling Output PID Temperature Controllers, Communication Manual MCT-TKC1-V2.2-EN",
+  "verified": false,
+  "notes": "The manual is a series-level manual ('TK Series'); the register chapter does not name TK4S, so model-specific features (heater current, DI-2, AL3, cooling MV) may be absent on a given TK4S variant. The manual lists each item as 'No(Address)', e.g. 400001(0000), 301001(03E8): the 0xxxxx/1xxxxx/3xxxxx/4xxxxx numbers are 1-based reference numbers and the hex value in parentheses is the 0-based protocol address. This preset uses the parenthesised protocol addresses with address_base=0: coils (FC01/05), discrete inputs (FC02), input registers (FC04: PV etc. at 0x03E8..0x03EF) and holding registers (FC03/06/16: groups 0x0000.., 0x0032.., comm group 0x00DA..). Values are integers with the decimal point defined by the 'Decimal Point' input register (0:0, 1:0.0, 2:0.00, 3:0.000); they are exposed raw (scale 1) because the scale is dynamic. H-MV/C-MV 0..1000 = 0.0..100.0 % (scale 0.1). Data signedness is not stated explicitly; int16 chosen for PV/SV/alarm values because the ranges include negative numbers (-1999, -30000). Defaults from the Default column: address 1, 9600 bps (2:96), parity NONE, stop bits 2 ('1: 2'), response wait 20 ms; data bits not stated in the portion read. Unit indicators (discrete inputs 0x0000/0x0001) and reserved/model-name/version registers are omitted. Whether comm parameter changes need a restart is not stated. Some parameter-group items may only be writable in certain modes (e.g. H-MV only in MAN) - not stated.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 2,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "RUN/STOP",
+      "address": 0,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "RUN",
+        "1": "STOP"
+      },
+      "sim": 0
+    },
+    {
+      "name": "Auto-Tuning Execute",
+      "address": 1,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "% Indicator",
+      "address": 2,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "OUT1 Indicator",
+      "address": 3,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "OUT2 Indicator",
+      "address": 4,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "AT Indicator",
+      "address": 5,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "SV1 Indicator",
+      "address": 6,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "SV2 Indicator",
+      "address": 7,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "SV3 Indicator",
+      "address": 8,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "AL1 Indicator",
+      "address": 9,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "AL2 Indicator",
+      "address": 10,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "MAN Indicator",
+      "address": 11,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI-1 Input",
+      "address": 12,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI-2 Input",
+      "address": 13,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "PV",
+      "address": 1000,
+      "fc": 4,
+      "type": "int16",
+      "group": "measure",
+      "sim": 250,
+      "note": "Raw integer; value = raw / 10^(Decimal Point). Special values 31000 OPEN, 30000 HHHH, -30000 LLLL."
+    },
+    {
+      "name": "Decimal Point",
+      "address": 1001,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "enum": {
+        "0": "0",
+        "1": "0.0",
+        "2": "0.00",
+        "3": "0.000"
+      },
+      "sim": 1
+    },
+    {
+      "name": "Indicator Unit",
+      "address": 1002,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "enum": {
+        "0": "C",
+        "1": "F",
+        "2": "%",
+        "3": "OFF"
+      },
+      "sim": 0
+    },
+    {
+      "name": "SV (monitor)",
+      "address": 1003,
+      "fc": 4,
+      "type": "int16",
+      "group": "measure",
+      "sim": 300,
+      "note": "Raw integer; scaled by Decimal Point."
+    },
+    {
+      "name": "H-MV (heating MV)",
+      "address": 1004,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "%",
+      "group": "measure",
+      "sim": 45.5
+    },
+    {
+      "name": "C-MV (cooling MV)",
+      "address": 1005,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "%",
+      "group": "measure",
+      "sim": 0
+    },
+    {
+      "name": "Indicator Bits",
+      "address": 1006,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit0..F per manual (bit3 OUT1, bit4 OUT2, bit5 AT, bit9 AL1, bitA AL2, bitB MAN, bitC DI-1, bitD DI-2)."
+    },
+    {
+      "name": "Heater Current",
+      "address": 1007,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "A",
+      "group": "measure",
+      "sim": 0
+    },
+    {
+      "name": "SV",
+      "address": 0,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 300,
+      "note": "Range 'within L-SV to H-SV' (parameter-dependent, no fixed numbers). Raw integer scaled by Decimal Point."
+    },
+    {
+      "name": "H-MV Manual",
+      "address": 1,
+      "fc": 3,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "%",
+      "access": "rw",
+      "min": 0,
+      "max": 100,
+      "group": "setpoint",
+      "sim": 0
+    },
+    {
+      "name": "C-MV Manual",
+      "address": 2,
+      "fc": 3,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "%",
+      "access": "rw",
+      "min": 0,
+      "max": 100,
+      "group": "setpoint",
+      "sim": 0
+    },
+    {
+      "name": "Auto/Manual",
+      "address": 3,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "control",
+      "enum": {
+        "0": "AUTO",
+        "1": "MAN"
+      },
+      "sim": 0
+    },
+    {
+      "name": "R-S Run/Stop",
+      "address": 50,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "control",
+      "enum": {
+        "0": "RUN",
+        "1": "STOP"
+      },
+      "sim": 0
+    },
+    {
+      "name": "SV-N Multi SV Number",
+      "address": 51,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "control",
+      "enum": {
+        "0": "SV-0",
+        "1": "SV-1",
+        "2": "SV-2",
+        "3": "SV-3"
+      },
+      "sim": 0
+    },
+    {
+      "name": "AL1.L Alarm 1 Low",
+      "address": 53,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "AL1.H Alarm 1 High",
+      "address": 54,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "AL2.L Alarm 2 Low",
+      "address": 55,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "AL2.H Alarm 2 High",
+      "address": 56,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "SV-0",
+      "address": 57,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "SV-1",
+      "address": 58,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "SV-2",
+      "address": 59,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "SV-3",
+      "address": 60,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "AL3.L Alarm 3 Low",
+      "address": 61,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "AL3.H Alarm 3 High",
+      "address": 62,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Signed raw integer; ranges are model/parameter-dependent in the manual; scaled by Decimal Point."
+    },
+    {
+      "name": "ADRS Communication Address",
+      "address": 218,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 99,
+      "group": "comm",
+      "sim": 1
+    },
+    {
+      "name": "BPS Communication Speed",
+      "address": 219,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "group": "comm",
+      "sim": 2,
+      "enum": {
+        "0": "2400 bps",
+        "1": "4800 bps",
+        "2": "9600 bps",
+        "3": "19200 bps",
+        "4": "38400 bps"
+      },
+      "note": "Manual lists 0:24, 1:48, 2:96, 3:192, 4:384 (unit 'bps' = value x100); default 2:96."
+    },
+    {
+      "name": "PRTY Parity",
+      "address": 220,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 2,
+      "group": "comm",
+      "enum": {
+        "0": "NONE",
+        "1": "EVEN",
+        "2": "ODD"
+      },
+      "sim": 0
+    },
+    {
+      "name": "STP Stop Bit",
+      "address": 221,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "comm",
+      "enum": {
+        "0": "1 bit",
+        "1": "2 bits"
+      },
+      "sim": 1
+    },
+    {
+      "name": "RSW.T Response Wait Time",
+      "address": 222,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "ms",
+      "access": "rw",
+      "min": 5,
+      "max": 99,
+      "group": "comm",
+      "sim": 20
+    },
+    {
+      "name": "COMW Communication Write",
+      "address": 223,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "comm",
+      "enum": {
+        "0": "Enable",
+        "1": "Disable"
+      },
+      "sim": 0
+    }
+  ]
+}

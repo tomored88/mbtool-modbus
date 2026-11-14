@@ -1,0 +1,401 @@
+{
+ "name": "ABB ACS355 embedded fieldbus (Modbus RTU)",
+ "manufacturer": "ABB",
+ "model": "ACS355 (embedded fieldbus, EFB)",
+ "verified": false,
+ "source": [
+  "https://manualzilla.com/doc/5661227/abb---acs-355"
+ ],
+ "doc_revision": "ACS355 user's manual 3AUA0000066143 (Manualzilla copy; the page text cites 'Rev A' for the fault-tracing chapter; ABB's own library copy https://library.e.abb.com/public/805f31a82d524d8aa8a750011e2cd001/EN_ACS355_UM_E_A5.pdf could not be fetched (over 10 MB) and was NOT read). Chapter 'Fieldbus control with embedded fieldbus' and 'Actual signals and parameters'.",
+ "notes": "Built from the Manualzilla copy of the ACS355 user's manual, read through a summarising fetch in 100k-character segments; NOT verified on a physical drive. Addressing: the manual numbers registers 4xxxx and states 'Register 4xxxx is addressed as xxxx -1' in the Modbus message (40002 -> 0001). Therefore address_base = 1 and each 'address' is the printed 4xxxx register number. Mapping per manual: 40001 control word (ABB drives profile), 40002 Reference 1, 40003 Reference 2, 40004 status word, 40005-40012 Actual 1..8 (selected by parameters 5310-5317; their defaults were not captured), 40031-40034 DCU-profile words (not included). 40101...49999 are drive parameters 0101...9999 (e.g. 40102 = parameter 0102; parameter 5302 = register 45302). Supported function codes per manual: 03, 06, 08 (subcodes 00, 01, 04), 10 (hex), 17. Parameter writes through Modbus are volatile; parameter 1607 PARAM SAVE stores them (manual). Scaling (FbEq) per the manual's actual-signal tables: 0103 1=0.1 Hz, 0104 1=0.1 A, 0105 1=0.1 %, 0106 1=0.1 kW, 0107 1 V, 0109 1 V, 0110 1=0.1 C, 0114 1 h, 0115 1 kWh. uint16/int16 choice is not stated by the manual for most signals; only 0101 (negative = reverse) is declared signed here. Reference scaling per manual (ABB drives profile): REF1 20000 = 100% = parameter 1105 (max speed/frequency); REF2 10000 = 100% = parameter 1108; both limited by parameters 1104/1105 and 1107/1108. Allowed REF min/max were not captured, so none is enforced. ABB drives profile control word (par. 5319 shows it in hex) bits: 0 OFF1 CONTROL, 1 OFF2 CONTROL, 2 OFF3 CONTROL, 3 INHIBIT OPERATION, 4 RAMP_OUT_ZERO (ABB DRV FULL only), 5 RAMP_HOLD, 6 RAMP_IN_ZERO, 7 RESET, 10 REMOTE_CMD (ABB DRV FULL only), 11 EXT CTRL LOC. Status word (par. 5320) bits: 0 RDY_ON, 1 RDY_RUN, 2 RDY_REF, 3 TRIPPED, 4 OFF_2_STA, 5 OFF_3_STA, 6 SWC_ON_INHIB, 7 ALARM, 8 AT_SETPOINT, 9 REMOTE, 10 ABOVE_LIMIT, 11 EXT CTRL LOC, 12 EXT RUN ENABLE. The exact control word values that start/stop the drive (state machine) were not captured; do not guess them. SAFETY: 40001/40002/40003 (group 'control') command a real motor (start/stop/speed). They are rw because the manual lists them R/W; they only act when the drive is configured for fieldbus control (EFB, group 53/10/11 parameters). NOT captured/unclear: default values of 5302 station ID, 5303 baud rate (rates 1.2-115.2 kbit/s), 5304 parity (the extract suggests 8 NONE 1 but this is not explicit) and 5305 profile; fault code tables; 5310-5317 default mappings; PI/other groups. Parameter-group registers 45302-45307 are marked read-only here as a precaution although the manual says parameters are writable through Modbus.",
+ "connection": {
+  "type": "rtu",
+  "data": 8,
+  "timeout": 1.0
+ },
+ "address_base": 1,
+ "points": [
+  {
+   "name": "Control Word",
+   "address": 40001,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "note": "ABB drives profile only. COMMANDS REAL MACHINERY."
+  },
+  {
+   "name": "Reference 1",
+   "address": 40002,
+   "fc": 3,
+   "type": "int16",
+   "access": "rw",
+   "group": "control",
+   "note": "External REF1 speed/frequency; +20000 = 100% = par. 1105. COMMANDS REAL MACHINERY."
+  },
+  {
+   "name": "Reference 2",
+   "address": 40003,
+   "fc": 3,
+   "type": "int16",
+   "access": "rw",
+   "group": "control",
+   "note": "External REF2; +10000 = 100% = par. 1108. COMMANDS REAL MACHINERY."
+  },
+  {
+   "name": "Status Word",
+   "address": 40004,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 1,
+   "note": "ABB drives profile only; bits in preset notes."
+  },
+  {
+   "name": "Actual 1",
+   "address": 40005,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5310; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "Actual 2",
+   "address": 40006,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5311; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "Actual 3",
+   "address": 40007,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5312; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "Actual 4",
+   "address": 40008,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5313; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "Actual 5",
+   "address": 40009,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5314; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "Actual 6",
+   "address": 40010,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5315; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "Actual 7",
+   "address": 40011,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5316; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "Actual 8",
+   "address": 40012,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "note": "Selected via parameter 5317; default mapping not captured. Signedness assumed."
+  },
+  {
+   "name": "0101 SPEED & DIR",
+   "address": 40101,
+   "fc": 3,
+   "type": "int16",
+   "unit": "rpm",
+   "access": "r",
+   "group": "status",
+   "sim": 1480,
+   "note": "Negative = reverse."
+  },
+  {
+   "name": "0102 SPEED",
+   "address": 40102,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "rpm",
+   "access": "r",
+   "group": "status",
+   "sim": 1480
+  },
+  {
+   "name": "0103 OUTPUT FREQ",
+   "address": 40103,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.1,
+   "unit": "Hz",
+   "access": "r",
+   "group": "status",
+   "sim": 50.0
+  },
+  {
+   "name": "0104 CURRENT",
+   "address": 40104,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.1,
+   "unit": "A",
+   "access": "r",
+   "group": "status",
+   "sim": 3.4
+  },
+  {
+   "name": "0105 TORQUE",
+   "address": 40105,
+   "fc": 3,
+   "type": "int16",
+   "scale": 0.1,
+   "unit": "%",
+   "access": "r",
+   "group": "status",
+   "note": "% of motor nominal torque. Signedness not stated; int16 assumed."
+  },
+  {
+   "name": "0106 POWER",
+   "address": 40106,
+   "fc": 3,
+   "type": "int16",
+   "scale": 0.1,
+   "unit": "kW",
+   "access": "r",
+   "group": "status",
+   "note": "Signedness not stated; int16 assumed."
+  },
+  {
+   "name": "0107 DC BUS VOLTAGE",
+   "address": 40107,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "V",
+   "access": "r",
+   "group": "status",
+   "sim": 540
+  },
+  {
+   "name": "0109 OUTPUT VOLTAGE",
+   "address": 40109,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "V",
+   "access": "r",
+   "group": "status",
+   "sim": 380
+  },
+  {
+   "name": "0110 DRIVE TEMP",
+   "address": 40110,
+   "fc": 3,
+   "type": "int16",
+   "scale": 0.1,
+   "unit": "C",
+   "access": "r",
+   "group": "status",
+   "sim": 41.5
+  },
+  {
+   "name": "0113 CTRL LOCATION",
+   "address": 40113,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "enum": {
+    "0": "LOCAL",
+    "1": "EXT1",
+    "2": "EXT2"
+   },
+   "sim": 1
+  },
+  {
+   "name": "0114 RUN TIME",
+   "address": 40114,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "h",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0115 KWH COUNTER",
+   "address": 40115,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "kWh",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0301 FB CMD WORD 1",
+   "address": 40301,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "16-bit word, shown in hex on panel."
+  },
+  {
+   "name": "0303 FB STS WORD 1",
+   "address": 40303,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0305 FAULT WORD 1",
+   "address": 40305,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "Bit-coded fault word (bit meanings not captured)."
+  },
+  {
+   "name": "0306 FAULT WORD 2",
+   "address": 40306,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0307 FAULT WORD 3",
+   "address": 40307,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0308 ALARM WORD 1",
+   "address": 40308,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0309 ALARM WORD 2",
+   "address": 40309,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0401 LAST FAULT",
+   "address": 40401,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "Fault code, 0 = no record. Code table not captured."
+  },
+  {
+   "name": "0412 PREVIOUS FAULT 1",
+   "address": 40412,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "0413 PREVIOUS FAULT 2",
+   "address": 40413,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "5302 EFB STATION ID",
+   "address": 45302,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "min": 0,
+   "max": 247,
+   "group": "config",
+   "note": "Range 0...247; default not captured."
+  },
+  {
+   "name": "5303 EFB BAUD RATE (raw)",
+   "address": 45303,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "Options 1.2 to 115.2 kbit/s; numeric coding and default not captured."
+  },
+  {
+   "name": "5304 EFB PARITY",
+   "address": 45304,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "enum": {
+    "0": "8 NONE 1",
+    "1": "8 NONE 2",
+    "2": "8 EVEN 1",
+    "3": "8 ODD 1"
+   },
+   "sim": 0
+  },
+  {
+   "name": "5305 EFB CTRL PROFILE (raw)",
+   "address": 45305,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "Options ABB DRV LIM, DCU PROFILE, ABB DRV FULL; numeric coding garbled in extract."
+  },
+  {
+   "name": "5306 EFB OK MESSAGES",
+   "address": 45306,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "Read-only counter 0...65535."
+  },
+  {
+   "name": "5307 EFB CRC ERRORS",
+   "address": 45307,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "Read-only counter 0...65535."
+  }
+ ]
+}

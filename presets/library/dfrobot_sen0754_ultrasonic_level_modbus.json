@@ -1,0 +1,163 @@
+{
+  "name": "DFRobot SEN0754 ultrasonic liquid level sensor (Modbus-RTU, TTL UART)",
+  "manufacturer": "DFRobot",
+  "model": "SEN0754 (Ultrasonic Liquid Level Monitoring Sensor)",
+  "source": [
+    "https://wiki.dfrobot.com/sen0754/docs/24696"
+  ],
+  "doc_revision": "DFRobot wiki page 'SEN0754' (no revision number or date)",
+  "verified": false,
+  "notes": "Included as the one low-cost 'generic' ultrasonic level sensor for which I could read a vendor register table; it is TTL-level UART (needs a TTL/RS485 or USB-UART adapter), not RS485. Register table was read through a summarising fetch tool (descriptions paraphrased, numbers exact). Addresses are the hex protocol addresses of the table (0x0100 = 256 etc.), address_base=0. Read FC03, write FC06, CRC-16/MODBUS, register data high byte first; read-only registers are read with FC03 (not FC04). Defaults: Modbus slave address 0x01 and baud rate 115200 (0x0009) per the register table; 8 data bits, 1 stop bit, no parity per the UART section. The page also describes an automatic UART output mode (100 ms cycle) which is not Modbus. No scaling note for the processed distance beyond 'mm' (and 'us' when the unit register is 1).",
+  "connection": {
+    "type": "rtu",
+    "baud": 115200,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Processed Distance",
+      "address": 256,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "mm",
+      "group": "measure",
+      "sim": 1234,
+      "note": "Register 0x0100: distance after the algorithm. 0xFFFE = co-frequency interference warning, 0xFFFD = no object detected. Unit is mm when 'Output Distance Unit' (0x0209) = 0; with 1 the register holds echo time in us (divide by 5.75 for mm). Response time ~100-230 ms."
+    },
+    {
+      "name": "Real-time Distance",
+      "address": 257,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "mm",
+      "group": "measure",
+      "sim": 1235,
+      "note": "Register 0x0101: single ranging result, no processing (~15-40 ms). Same special values 0xFFFE / 0xFFFD."
+    },
+    {
+      "name": "Temperature",
+      "address": 258,
+      "fc": 3,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "degC",
+      "group": "measure",
+      "sim": 21.5,
+      "note": "Register 0x0102: signed, divide by 10 for degC; resolution 0.5 degC."
+    },
+    {
+      "name": "Echo Time",
+      "address": 266,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "us",
+      "group": "diagnostic",
+      "sim": 7100,
+      "note": "Register 0x010A: echo time in us; divide by 5.75 to get mm. Same special values 0xFFFE / 0xFFFD."
+    },
+    {
+      "name": "Slave Address",
+      "address": 512,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 254,
+      "group": "config",
+      "sim": 1,
+      "note": "Register 0x0200, default 0x01; 0xFF is the broadcast address. Writing moves the device."
+    },
+    {
+      "name": "Baud Rate",
+      "address": 513,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 2,
+      "max": 9,
+      "group": "config",
+      "sim": 9,
+      "enum": {
+        "2": "4800",
+        "3": "9600",
+        "4": "14400",
+        "5": "19200",
+        "6": "38400",
+        "7": "57600",
+        "8": "76800",
+        "9": "115200 (default)"
+      },
+      "note": "Register 0x0201. Takes effect immediately - the connection drops."
+    },
+    {
+      "name": "Signal Level",
+      "address": 520,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 9,
+      "group": "config",
+      "sim": 5,
+      "note": "Register 0x0208, default 5. Higher = wider angle, more sensitivity, longer range (approx range 1 = 50 cm ... 5 = 200 cm ... 9 = 300 cm)."
+    },
+    {
+      "name": "Output Distance Unit",
+      "address": 521,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "mm",
+        "1": "us (echo time)"
+      },
+      "sim": 0,
+      "note": "Register 0x0209. Default not stated."
+    },
+    {
+      "name": "Power Supply Noise Reduction",
+      "address": 538,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 5,
+      "group": "config",
+      "sim": 1,
+      "note": "Register 0x021A, default 1. Higher = more suppression but narrower angle."
+    },
+    {
+      "name": "Range",
+      "address": 543,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "mm",
+      "access": "rw",
+      "min": 300,
+      "max": 3000,
+      "group": "config",
+      "sim": 2000,
+      "note": "Register 0x021F, default 2000 mm; maximum range depends on the angle class of the sensor."
+    },
+    {
+      "name": "Algorithm Mode",
+      "address": 552,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 5,
+      "group": "config",
+      "sim": 1,
+      "note": "Register 0x0228, default 1. Modes 0, 4, 5 = real-time; 1, 2, 3 = processed (>= 2 s response)."
+    }
+  ]
+}

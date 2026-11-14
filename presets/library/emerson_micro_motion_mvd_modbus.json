@@ -1,0 +1,409 @@
+{
+  "name": "Emerson Micro Motion MVD transmitter (Modbus, legacy register map; Models 1500/2700 family)",
+  "manufacturer": "Emerson (Micro Motion)",
+  "model": "MVD transmitters (Series 1000/2000, Model 1500/1700/2700 - register equivalence not confirmed)",
+  "source": [
+    "https://manualzilla.com/doc/7367182/emerson-micro-motion-2700-instruction-manual?page=49",
+    "https://www.emerson.com/documents/automation/instruction-manual-modbus-interface-tool-micro-motion-en-65520.pdf"
+  ],
+  "doc_revision": "Using Modbus Protocol with Micro Motion Transmitters, P/N 3600219 Rev. B, July 2002 (register map); Modbus Interface Tool getting-started manual 65520 Rev AC Nov 2016 (addressing, byte order)",
+  "verified": false,
+  "notes": "READ THIS FIRST: the only Micro Motion Modbus register list I could actually read is the legacy 'Using Modbus Protocol with Micro Motion Transmitters' (P/N 3600219 Rev B, July 2002, covers RFT9739 / MVDSolo / Series 1000 and 2000) via a manualzilla copy appended to a Model 2700 manual page; the current Emerson 'Modbus Interface Tool' list (document 65520, which includes Models 1500, 1700 and 2700 with analog outputs) is an Excel workbook that is NOT part of the readable PDF. The register numbers below are therefore the legacy map; that they are identical on 1500/1700/2700 transmitters is NOT confirmed. The PDF 65520 itself (Rev AC, 2016) confirms the addressing rule, float format, default float byte order for MVD transmitters (2-3 0-1) and that FC03/04 and FC01/02 are interchangeable. The legacy manual text was read through a summarising fetch tool (page text 715k characters, tables reconstructed), so table rows (especially unit codes and the 'Fault Status' number) must be re-checked against the manual. Addressing: the manual numbers registers 1-based with a type prefix (2xxxx float pair, 3xxxx input, 4xxxx holding, 0xxxx coil) and says to subtract 1 for most PLCs (example: manual address 42 is 41 in the Modbus frame). The preset uses address_base=1 and puts the manual number without its leading type digit in 'address' (e.g. 20247 -> 247, 40039 -> 39, coil 00002 -> 2) so the protocol address is the number minus 1 (mass flow = 246). Floats: single precision IEEE 754 in register pairs; MVD transmitters send them in the byte order set in holding 40521 (default code 1 = 2-3 0-1, i.e. low word first), hence word_order=little. NaN for a bad value is 7FA00000 on MVD transmitters. Engineering units depend on the unit-code registers (shown as separate enum points, read-only here); no unit is hard-coded on the process values. The integer process-variable input registers (30002..) need scale factors and were left out. Communication settings (baud, parity) are in holding 41133..41135 but their code values were not read; connection block is a placeholder, not a documented default. Control points (totalizer start/stop and resets) are plain coil writes but change totals; zero/calibration coils were not included.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 1,
+  "points": [
+    {
+      "name": "Mass Flow Rate",
+      "address": 247,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 12.5,
+      "note": "Float register pair 247/248 (manual number 20247). Unit follows the unit-code register: 'Mass Flow Unit' (holding 40039)."
+    },
+    {
+      "name": "Density",
+      "address": 249,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 998.2,
+      "note": "Float register pair 249/250 (manual number 20249). Unit follows the unit-code register: 'Density Unit' (holding 40040)."
+    },
+    {
+      "name": "Temperature",
+      "address": 251,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 21.5,
+      "note": "Float register pair 251/252 (manual number 20251). Unit follows the unit-code register: 'Temperature Unit' (holding 40041)."
+    },
+    {
+      "name": "Volume Flow Rate",
+      "address": 253,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 0.75,
+      "note": "Float register pair 253/254 (manual number 20253). Unit follows the unit-code register: 'Volume Flow Unit' (holding 40042)."
+    },
+    {
+      "name": "Pressure",
+      "address": 257,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 1.2,
+      "note": "Float register pair 257/258 (manual number 20257). Unit follows the unit-code register: 'Pressure Unit' (holding 40044)."
+    },
+    {
+      "name": "Mass Total",
+      "address": 259,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 1000.0,
+      "note": "Float register pair 259/260 (manual number 20259). Unit follows the unit-code register: 'Mass Total Unit' (holding 40045)."
+    },
+    {
+      "name": "Volume Total",
+      "address": 261,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 1.0,
+      "note": "Float register pair 261/262 (manual number 20261). Unit follows the unit-code register: 'Volume Total Unit' (holding 40046)."
+    },
+    {
+      "name": "Mass Inventory",
+      "address": 263,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 5000.0,
+      "note": "Float register pair 263/264 (manual number 20263). Unit follows the unit-code register: 'Mass Total Unit' (holding 40045)."
+    },
+    {
+      "name": "Volume Inventory",
+      "address": 265,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "little",
+      "group": "measure",
+      "sim": 5.0,
+      "note": "Float register pair 265/266 (manual number 20265). Unit follows the unit-code register: 'Volume Total Unit' (holding 40046)."
+    },
+    {
+      "name": "Mass Flow Unit",
+      "address": 39,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "70": "g/s",
+        "71": "g/min",
+        "72": "g/h",
+        "73": "kg/s",
+        "74": "kg/min",
+        "75": "kg/h",
+        "76": "kg/day",
+        "77": "metric tons/min",
+        "78": "metric tons/h",
+        "79": "metric tons/day",
+        "80": "lb/s",
+        "81": "lb/min",
+        "82": "lb/h",
+        "83": "lb/day",
+        "84": "short tons/min",
+        "85": "short tons/h",
+        "86": "short tons/day",
+        "87": "long tons/h",
+        "88": "long tons/day",
+        "253": "Special"
+      },
+      "sim": 75,
+      "note": "Holding register 40039. Unit code for Mass Flow Rate. Writable per manual; left read-only here."
+    },
+    {
+      "name": "Density Unit",
+      "address": 40,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "90": "Specific gravity",
+        "91": "g/cc",
+        "92": "kg/m3",
+        "93": "lb/gal",
+        "94": "lb/ft3",
+        "95": "g/mL",
+        "96": "kg/L",
+        "97": "g/L",
+        "98": "lb/in3",
+        "99": "short tons/yd3",
+        "104": "degrees API"
+      },
+      "sim": 92,
+      "note": "Holding register 40040."
+    },
+    {
+      "name": "Temperature Unit",
+      "address": 41,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "32": "degC",
+        "33": "degF",
+        "34": "degR",
+        "35": "K"
+      },
+      "sim": 32,
+      "note": "Holding register 40041."
+    },
+    {
+      "name": "Volume Flow Unit",
+      "address": 42,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "15": "cu ft/min",
+        "16": "US gal/min",
+        "17": "L/min",
+        "18": "imperial gal/min",
+        "19": "m3/h",
+        "22": "US gal/s",
+        "23": "million US gal/day",
+        "24": "L/s",
+        "25": "million L/day",
+        "26": "cu ft/s",
+        "27": "cu ft/day",
+        "28": "m3/s",
+        "29": "m3/day",
+        "30": "imperial gal/h",
+        "31": "imperial gal/day",
+        "130": "cu ft/h",
+        "131": "m3/min",
+        "132": "barrels/s",
+        "133": "barrels/min",
+        "134": "barrels/h",
+        "135": "barrels/day",
+        "136": "US gal/h",
+        "137": "imperial gal/s",
+        "138": "L/h",
+        "235": "US gal/day",
+        "253": "Special"
+      },
+      "sim": 19,
+      "note": "Holding register 40042."
+    },
+    {
+      "name": "Pressure Unit",
+      "address": 44,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "1": "inches water @ 68F",
+        "2": "inches mercury @ 0C",
+        "3": "feet water @ 68F",
+        "4": "mm water @ 68F",
+        "5": "mm mercury @ 0C",
+        "6": "psi",
+        "7": "bar",
+        "8": "millibar",
+        "9": "g/cm2",
+        "10": "kg/cm2",
+        "11": "pascals",
+        "12": "kPa",
+        "13": "torr @ 0C",
+        "14": "atmospheres"
+      },
+      "sim": 7,
+      "note": "Holding register 40044."
+    },
+    {
+      "name": "Mass Total Unit",
+      "address": 45,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "60": "grams",
+        "61": "kilograms",
+        "62": "metric tons",
+        "63": "pounds",
+        "64": "short tons (2000 lb)",
+        "65": "long tons (2240 lb)",
+        "253": "Special"
+      },
+      "sim": 61,
+      "note": "Holding register 40045. Applies to mass total and mass inventory."
+    },
+    {
+      "name": "Volume Total Unit",
+      "address": 46,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "40": "US gallons",
+        "41": "liters",
+        "42": "imperial gallons",
+        "43": "cubic meters",
+        "46": "barrels (42 US gal)",
+        "112": "cubic feet",
+        "253": "Special"
+      },
+      "sim": 43,
+      "note": "Holding register 40046. Applies to volume total and volume inventory."
+    },
+    {
+      "name": "Polling Address",
+      "address": 47,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "sim": 1,
+      "note": "Holding register 40047 (Modbus slave address). The manual text read states writing 1..15 sets it while the valid transmitter range is 1..247; left read-only because that is unclear."
+    },
+    {
+      "name": "Float Byte Order",
+      "address": 521,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "sim": 1,
+      "enum": {
+        "0": "0-1-2-3 (word order big)",
+        "1": "2-3-0-1 (default; word order little)",
+        "2": "1-0-3-2",
+        "3": "3-2-1-0"
+      },
+      "note": "Holding register 40521. This preset decodes all floats with word_order=little, i.e. code 1 = 2-3-0-1 (the factory default). If this register reads 0 change the points to big; codes 2 and 3 (byte swapped) cannot be expressed in this tool."
+    },
+    {
+      "name": "Sensor Failure",
+      "address": 24,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "OK",
+        "1": "Sensor failure"
+      },
+      "sim": 0,
+      "note": "Coil 00024 / discrete input 10024 (read with FC01 or FC02, interchangeable in Micro Motion's implementation)."
+    },
+    {
+      "name": "Fault Status",
+      "address": 69,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "No fault",
+        "1": "Fault"
+      },
+      "sim": 0,
+      "note": "Discrete input/coil 0069 'Fault status (ON/OFF)' per Appendix A table A-3 as summarised by the fetch tool; check the number against the manual."
+    },
+    {
+      "name": "Totalizers Run",
+      "address": 2,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Totalizers OFF (hold)",
+        "1": "Totalizers ON"
+      },
+      "sim": 1,
+      "note": "Coil 00002. Sticky read/write coil. OFF freezes totals and sets the frequency output to 0 Hz - AFFECTS THE MEASUREMENT / PROCESS OUTPUTS."
+    },
+    {
+      "name": "Reset All Totals",
+      "address": 3,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Coil 00003. Momentary: write 1 to reset mass, volume and API totals to zero; returns to 0 itself. DESTROYS ACCUMULATED TOTALS."
+    },
+    {
+      "name": "Reset Inventories",
+      "address": 4,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Coil 00004. Momentary: write 1 to reset mass and volume inventories to zero. DESTROYS ACCUMULATED INVENTORIES."
+    },
+    {
+      "name": "Reset Mass Total",
+      "address": 56,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Coil 00056. Momentary: resets the mass total only."
+    },
+    {
+      "name": "Reset Volume Total",
+      "address": 57,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Coil 00057. Momentary: resets the volume total only."
+    }
+  ]
+}

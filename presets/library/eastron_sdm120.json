@@ -1,0 +1,379 @@
+{
+  "name": "Eastron SDM120 (SDM120-Modbus)",
+  "manufacturer": "Eastron",
+  "model": "SDM120",
+  "source": [
+    "https://cdn.shopify.com/s/files/1/0418/3749/4423/files/Eastron_SDM120_Sereis_Electricity_Meters_MODBUS_Protocol.pdf"
+  ],
+  "doc_revision": "SDM120-Modbus RTU Protocol - 'Eastron SDM120Modbus Smart Meter Modbus Protocol Implementation V2.4' (Zhejiang Eastron, 8 pages, PDF created 2019-08)",
+  "verified": false,
+  "notes": "Built only from the Eastron protocol PDF listed in 'source'. Addressing: the document lists register numbers (30001 = input register, 40001 = holding register) plus the 'Modbus Protocol Start Address Hex'. This preset uses address_base 0 and the PROTOCOL address: input register number minus 30001 (e.g. 30073 -> 72 = 0x0048), holding register number minus 40001 (e.g. 40021 -> 20 = 0x0014); all addresses were cross-checked against the doc's hex column. The F9xx / FCxx registers are taken from the hex column (463745 -> 0xF900, 463761 -> 0xF910, 463777 -> 0xF920, 464513 -> 0xFC00, 464515 -> 0xFC02, 464516 -> 0xFC03). All measurements are 32-bit IEEE754 floats, high register first (doc example: 43 66 33 34 = 230.2 V). Reads must start on an even address and use an even register count. Config values such as baud/parity/ID are also stored as 4-byte floats (FC03 read, FC16 write), per the document. Defaults stated by the doc: ID 1, parity/stop code 0 (1 stop, no parity), baud code 0 = 2400 baud (doc marks 2400 as default); parity/baud/ID changes need a restart. NOT included: no 'reset' registers are documented in this PDF; the demand block is included read-only. The document gives no register for 'Demand time' even though its example mentions it, so it is omitted. Word order of the unsigned-int32 serial number is not stated (big assumed by the tool default, see point note). Not verified against a physical device. Document version V2.4 may differ from other SDM120 hardware revisions. max_block=40: the protocol document limits one request to 40 values (80 registers).",
+  "connection": {
+    "type": "rtu",
+    "baud": 2400,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Voltage",
+      "address": 0,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Current",
+      "address": 6,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Active power",
+      "address": 12,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Apparent power",
+      "address": 18,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Reactive power",
+      "address": 24,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VAr",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Power factor",
+      "address": 30,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Frequency",
+      "address": 70,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "Hz",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Import active energy",
+      "address": 72,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export active energy",
+      "address": 74,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Import reactive energy",
+      "address": 76,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export reactive energy",
+      "address": 78,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total system power demand",
+      "address": 84,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum total system power demand",
+      "address": 86,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Import system power demand",
+      "address": 88,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum import system power demand",
+      "address": 90,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Export system power demand",
+      "address": 92,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum export system power demand",
+      "address": 94,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Current demand",
+      "address": 258,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum current demand",
+      "address": 264,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Total active energy",
+      "address": 342,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total reactive energy",
+      "address": 344,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Relay pulse width",
+      "address": 12,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "ms",
+      "access": "rw",
+      "min": 60,
+      "max": 200,
+      "group": "config",
+      "note": "Doc: relay on period in ms, 60, 100 or 200, default 100. min/max are the extremes of the three allowed values; only 60/100/200 are valid. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Network parity/stop",
+      "address": 18,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "1 stop bit, no parity (default)",
+        "1": "1 stop bit, even parity",
+        "2": "1 stop bit, odd parity",
+        "3": "2 stop bits, no parity"
+      },
+      "note": "Requires a restart to become effective. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Meter ID (Modbus address)",
+      "address": 20,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "note": "Doc: ranges from 1 to 247, default 1. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Baud rate",
+      "address": 28,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "0": "2400 (default)",
+        "1": "4800",
+        "2": "9600",
+        "5": "1200"
+      },
+      "note": "Doc lists only codes 0, 1, 2 and 5. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Pulse 1 output mode",
+      "address": 86,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "1": "Import active energy",
+        "2": "Import + export active energy",
+        "4": "Export active energy (default)",
+        "5": "Import reactive energy",
+        "6": "Import + export reactive energy",
+        "8": "Export reactive energy"
+      },
+      "note": "Doc writes these as 0001, 0002, 0004, 0005, 0006, 0008 in a float. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Time of scroll display",
+      "address": 63744,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "s",
+      "access": "rw",
+      "min": 0,
+      "max": 30,
+      "group": "config",
+      "note": "Doc: range 0-30 s, default 0 = does not display in turns. 2-byte HEX. Register number 463745."
+    },
+    {
+      "name": "Pulse 1 constant",
+      "address": 63760,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "0": "0.001 kWh/imp (default)",
+        "1": "0.01 kWh/imp",
+        "2": "0.1 kWh/imp",
+        "3": "1 kWh/imp"
+      },
+      "note": "Doc register number 463761; 2-byte HEX."
+    },
+    {
+      "name": "Measurement mode",
+      "address": 63776,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "1": "Mode 1 (total = import)",
+        "2": "Mode 2 (total = import + export) (default)",
+        "3": "Mode 3 (total = import - export)"
+      },
+      "note": "Doc register number 463777; 2-byte HEX."
+    },
+    {
+      "name": "Serial number",
+      "address": 64512,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "big",
+      "access": "r",
+      "group": "config",
+      "note": "Doc: unsigned int32, read only (register number 464513). Word order is not stated in the doc; big (tool default) is an assumption."
+    },
+    {
+      "name": "Meter code",
+      "address": 64514,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "note": "Doc: 'Meter code = 00 20', 2-byte HEX, read only (register number 464515)."
+    },
+    {
+      "name": "Software version",
+      "address": 64515,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "note": "Doc: 2-byte HEX, read only (register number 464516)."
+    }
+  ],
+  "max_block": 40
+}

@@ -1,0 +1,360 @@
+{
+  "name": "Advantech ADAM-6050 (12DI/6DO, Modbus TCP)",
+  "manufacturer": "Advantech",
+  "model": "ADAM-6050",
+  "source": [
+    "https://www.kolbinger.at/DAQM/manuals/ADAM-6000%20Series_Manual_Ed3.pdf"
+  ],
+  "doc_revision": "ADAM-6000 Series Ethernet-based Data Acquisition and Control Modules User Manual, January 2008, 3rd Edition, Appendix B.2.5 ADAM-6050/6050W",
+  "verified": false,
+  "notes": "Appendix B.2.5 lists reference numbers (DI 00001-00012 'Read', DO 00017-00022 R/W, counter/frequency 40001-40024). The manual's own examples are ambiguous about the on-wire address (FC02 example 'Read coil number 1 to 8 (address number 00001 to 00008)' is sent as '01 02 00 01 00 08'; FC01 example for 00017-00024 is '01 01 00 17 00 08'; FC06 example 'register 40002' is '01 06 00 02 ...'). Assumption: standard 1-based reference numbering, address_base=1, protocol address = number - 1 (DI 0..11, DO 16..21, counters 0..23). UNCERTAIN - if the device returns shifted data, set address_base to 0. DI are read with FC02 (the manual's FC02 example uses 00001-00008), DO with FC01/FC05. Counter registers: 2 words per channel, low word first (formula 'value of 40002 x 65535 + value of 40001'; the 65535 multiplier is as printed). Counter start/stop/clear coils (00033...), pulse output and 'All DI/DO value' words (40301/40303) are omitted because their layout in the extracted table was ambiguous. The manual excerpt read gives no default IP, port or unit ID, so the connection block only states TCP.",
+  "connection": {
+    "type": "tcp",
+    "timeout": 1.0
+  },
+  "address_base": 1,
+  "points": [
+    {
+      "name": "DI 0",
+      "address": 1,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 1",
+      "address": 2,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 2",
+      "address": 3,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 3",
+      "address": 4,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 4",
+      "address": 5,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 5",
+      "address": 6,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 6",
+      "address": 7,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 7",
+      "address": 8,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 8",
+      "address": 9,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 9",
+      "address": 10,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 10",
+      "address": 11,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 11",
+      "address": 12,
+      "fc": 2,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DO 0",
+      "address": 17,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DO 1",
+      "address": 18,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DO 2",
+      "address": 19,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DO 3",
+      "address": 20,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DO 4",
+      "address": 21,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DO 5",
+      "address": 22,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 0 Counter/Frequency",
+      "address": 40001,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 1 Counter/Frequency",
+      "address": 40003,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 2 Counter/Frequency",
+      "address": 40005,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 3 Counter/Frequency",
+      "address": 40007,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 4 Counter/Frequency",
+      "address": 40009,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 5 Counter/Frequency",
+      "address": 40011,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 6 Counter/Frequency",
+      "address": 40013,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 7 Counter/Frequency",
+      "address": 40015,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 8 Counter/Frequency",
+      "address": 40017,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 9 Counter/Frequency",
+      "address": 40019,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 10 Counter/Frequency",
+      "address": 40021,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    },
+    {
+      "name": "DI 11 Counter/Frequency",
+      "address": 40023,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "little",
+      "group": "counter",
+      "sim": 0,
+      "note": "Only valid when the channel is configured as counter/frequency. Counter = high*65535 + low as printed in manual (probably 65536); frequency = low word / 10 Hz."
+    }
+  ]
+}

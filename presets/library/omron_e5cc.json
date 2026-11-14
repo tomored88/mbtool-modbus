@@ -1,0 +1,244 @@
+{
+  "name": "Omron E5CC digital temperature controller (Modbus)",
+  "manufacturer": "Omron",
+  "model": "E5CC",
+  "source": [
+    "https://files.omron.eu/downloads/latest/manual/en/h175_e5_c_communications_manual_en.pdf"
+  ],
+  "doc_revision": "E5@C Digital Temperature Controllers Communications Manual (H175), PDF keywords 'H175-E1-17 0922'",
+  "verified": false,
+  "notes": "Uses the Two-byte mode addresses (hex) of the Section 5 variable area list; Modbus function codes 03 (read), 06 and 16 (write). The manual's addresses are protocol addresses (example: PV read at 'Address H2000'), so address_base=0. Four-byte mode addresses (0000, 0004, ...) are not used. Data are signed 16-bit integers in two's complement without decimal point (D'105.0 -> 1050); PV/SP/alarm values are therefore raw (scale depends on sensor/decimal point); MV and heater current have fixed 0.1 resolution per the manual's ranges. Status registers are bit fields defined in the CompoWay/F chapter (not read here). Registers that are not displayed or model dependent (E5EC/E5AC only etc.) are omitted. Communication parameters (unit no. default 1, send wait 20 ms default; baud 9.6/19.2/38.4/57.6 kbit/s) are set on the front panel and are NOT in the variable area; they take effect after controller reset. Table 1-1-6 highlights defaults: 9.6 kbit/s, unit 1, parity Even (highlight read from a page image - please confirm); for Modbus the manual requires 8 data bits and 1 stop bit with Even/Odd parity or 2 stop bits with parity None, hence the connection block (9600, E, 8, 1) is derived from those statements. Writes can be rejected (error 04) when the Communications Writing parameter is OFF, during AT execution, or for protect-level parameters. The heating P/I/D rows were not found in the extracted table and are omitted.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "E",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "PV",
+      "address": 8192,
+      "fc": 3,
+      "type": "int16",
+      "group": "measure",
+      "sim": 250,
+      "note": "Raw integer; scaled by the Decimal Point Monitor (0x2410). Range per sensor."
+    },
+    {
+      "name": "Status (low 16 bits)",
+      "address": 8193,
+      "fc": 3,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit layout is in the CompoWay/F section (page 3-23) of the manual; not decoded here."
+    },
+    {
+      "name": "Internal Set Point",
+      "address": 8194,
+      "fc": 3,
+      "type": "int16",
+      "group": "measure",
+      "sim": 300,
+      "note": "Raw integer, scaled by Decimal Point Monitor. SP lower limit to SP upper limit."
+    },
+    {
+      "name": "Heater Current 1 Value Monitor",
+      "address": 8195,
+      "fc": 3,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "A",
+      "group": "measure",
+      "sim": 0
+    },
+    {
+      "name": "MV Monitor (Heating)",
+      "address": 8196,
+      "fc": 3,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "%",
+      "group": "measure",
+      "sim": 12.5
+    },
+    {
+      "name": "MV Monitor (Cooling)",
+      "address": 8197,
+      "fc": 3,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "%",
+      "group": "measure",
+      "sim": 0
+    },
+    {
+      "name": "Multi-SP No. Monitor",
+      "address": 9220,
+      "fc": 3,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0
+    },
+    {
+      "name": "Decimal Point Monitor",
+      "address": 9232,
+      "fc": 3,
+      "type": "uint16",
+      "group": "status",
+      "sim": 1,
+      "note": "0..3 = number of decimal places of PV/SP."
+    },
+    {
+      "name": "Set Point",
+      "address": 8451,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 300,
+      "note": "SP lower limit to SP upper limit (parameter-dependent, no fixed min/max). Raw integer scaled by Decimal Point Monitor. Same SP is also at 0x2602 (operation level)."
+    },
+    {
+      "name": "Set Point (operation level)",
+      "address": 9730,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "setpoint",
+      "sim": 300,
+      "note": "Same limits as Set Point."
+    },
+    {
+      "name": "Manual MV",
+      "address": 9728,
+      "fc": 3,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "%",
+      "access": "rw",
+      "min": -5,
+      "max": 105,
+      "group": "setpoint",
+      "sim": 0,
+      "note": "Standard control range -5.0..105.0; heating/cooling control allows -105.0..105.0 (min/max here use the standard range)."
+    },
+    {
+      "name": "Alarm Value 1",
+      "address": 8452,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": -1999,
+      "max": 9999,
+      "group": "alarm",
+      "sim": 0,
+      "note": "Raw integer; manual range -1999 to 9999."
+    },
+    {
+      "name": "Alarm Value Upper Limit 1",
+      "address": 8453,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": -1999,
+      "max": 9999,
+      "group": "alarm",
+      "sim": 0,
+      "note": "Raw integer; manual range -1999 to 9999."
+    },
+    {
+      "name": "Alarm Value Lower Limit 1",
+      "address": 8454,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": -1999,
+      "max": 9999,
+      "group": "alarm",
+      "sim": 0,
+      "note": "Raw integer; manual range -1999 to 9999."
+    },
+    {
+      "name": "Alarm Value 2",
+      "address": 8455,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": -1999,
+      "max": 9999,
+      "group": "alarm",
+      "sim": 0,
+      "note": "Raw integer; manual range -1999 to 9999."
+    },
+    {
+      "name": "Alarm Value Upper Limit 2",
+      "address": 8456,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": -1999,
+      "max": 9999,
+      "group": "alarm",
+      "sim": 0,
+      "note": "Raw integer; manual range -1999 to 9999."
+    },
+    {
+      "name": "Alarm Value Lower Limit 2",
+      "address": 8457,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": -1999,
+      "max": 9999,
+      "group": "alarm",
+      "sim": 0,
+      "note": "Raw integer; manual range -1999 to 9999."
+    },
+    {
+      "name": "Process Value Input Shift",
+      "address": 10019,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": -1999,
+      "max": 9999,
+      "group": "config",
+      "sim": 0
+    },
+    {
+      "name": "Input Digital Filter",
+      "address": 10240,
+      "fc": 3,
+      "type": "uint16",
+      "scale": 0.1,
+      "access": "rw",
+      "min": 0,
+      "max": 999.9,
+      "group": "config",
+      "sim": 0,
+      "note": "Manual range 0.0 to 999.9 (unit not stated in the extracted table)."
+    },
+    {
+      "name": "Operation/Adjustment Protect",
+      "address": 9472,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "sim": 0,
+      "enum": {
+        "0": "No restrictions",
+        "1": "Move to adjustment level prohibited",
+        "2": "Only PV and PV/SP parameters change allowed",
+        "3": "Only PV and PV/SP display allowed"
+      }
+    }
+  ]
+}

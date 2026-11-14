@@ -1,0 +1,67 @@
+{
+  "device_type": "temperature",
+  "name": "XY-MD02 RS485 temperature/humidity transmitter (SHT20)",
+  "manufacturer": "Generic (XY-MD02 board; manufacturer not named in the document)",
+  "model": "XY-MD02",
+  "source": [
+    "https://knowledgebase.grenton.com/hubfs/xy-md02-manual.pdf",
+    "https://knowledgebase.grenton.com/en/integration-with-xy-md02-temperature-and-humidity-sensor"
+  ],
+  "doc_revision": "XY-MD02 datasheet/protocol PDF (6 pages, no revision stated; hosted by Grenton knowledge base)",
+  "verified": false,
+  "notes": "Addresses are protocol (0-based) addresses exactly as printed in the command frames: temperature = FC04 start 0x0001, humidity = FC04 start 0x0002, slave address = FC03/06 register 0x0101, baud = register 0x0102 (written together with 0x0101 via FC16 in the example). address_base=0, no conversion. Temperature is a signed 16-bit value /10 (doc: 0xFF33 = -205 = -20.5 C); humidity /10 (0x222=546 -> 54.6 %RH); humidity signedness not stated, uint16 used. Baud register 0x0102: the doc only shows an example writing 0x2580 (=9600) ('Set Baud Rate to 0x2580 by register 2'); it is therefore modelled as a raw baud number; the list of allowed baud values is NOT documented. Temperature/humidity correction registers are mentioned by the Grenton article but their addresses are NOT given in the PDF, so they are omitted. Defaults: address 1~247 (default 1) from the PDF; 9600 baud, no parity, stop bit 1, address 1 from the Grenton article and the PDF's UART table (8 data bits, 9600, 1 stop, no parity). Whether address/baud changes need a power cycle is not stated.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Temperature",
+      "address": 1,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "C",
+      "group": "measure",
+      "sim": -20.5
+    },
+    {
+      "name": "Humidity",
+      "address": 2,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "%RH",
+      "group": "measure",
+      "sim": 54.6
+    },
+    {
+      "name": "Slave Address",
+      "address": 257,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "sim": 1
+    },
+    {
+      "name": "Baud Rate",
+      "address": 258,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "baud",
+      "access": "rw",
+      "group": "config",
+      "sim": 9600,
+      "note": "Raw baud number (example in doc writes 0x2580 = 9600). Other permitted values not documented."
+    }
+  ]
+}

@@ -1,0 +1,557 @@
+{
+  "name": "Siemens SITRANS F M MAG 6000 with Modbus RTU RS485 module (USM II)",
+  "manufacturer": "Siemens",
+  "model": "SITRANS F M MAG 6000 (Modbus RTU module FDK:085U0234)",
+  "source": [
+    "https://cache.industry.siemens.com/dl/files/906/44880906/att_70364/v1/A5E00753974-ABen_USMII_MODBUS_AOM_OI_en-US.pdf"
+  ],
+  "doc_revision": "SITRANS F Communication Modules Modbus RTU RS 485 Operating Instructions, 03/2021, A5E00753974-AB (FDK-085U0234)",
+  "verified": false,
+  "notes": "Register map is Appendix A and B of the add-on module manual (also covers MASS 6000, product code 25; only the MAG 6000 tables were used; the MASS 6000 process-data layout differs and is not in this preset). Tables list both a 'MODBUS register' (4:03003) and a 'MODBUS address' (3002); the manual's own example reads 'absolute massflow (4:03001)' with start address 0x0BB8 = 3000, so the frame address is the second column. address_base=0 and 'address' is that MODBUS address column. Data are big-endian; floats are IEEE 754 with the high word first (manual example 100.0 = 42C80000 in registers N, N+1), doubles occupy 4 registers; 'Byte' type values live in the low byte of one register. Only FC01, 03, 05, 16 (and 17) are supported; reads use FC03 for all registers (holding register area, 4:). Engineering units of flow/totalizer follow the unit registers (default m3/s and m3), exposed as separate enum points; values carry no hard-coded unit. Unit IDs were transcribed from a table with a garbled text layer. Factory communication settings stated in Table 5-1: address 1, 19200 baud, Even parity 1 stop bit, response delay 0, interframe space 3.5 chars. Writable settings are marked rw; they affect scaling/outputs of the meter (Q max, low flow cut-off, flow direction) or the link itself (address, baud) - handle with care. Totalizer reset/hold coils are plain coil writes and are in group 'control'. Left out: zero adjust (only on MAG 6000 SV, calibration), current/pulse/relay output setup, batch, service info, TAG and other strings, restart-Modbus coil, auto-zero start coil (0:00009).",
+  "connection": {
+    "type": "rtu",
+    "baud": 19200,
+    "parity": "E",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Absolute Volume Flow",
+      "address": 3002,
+      "fc": 3,
+      "type": "float32",
+      "group": "measure",
+      "sim": 0.012,
+      "note": "Customer unit set by 'Volume Flow Unit' (register 4:02907, default m3/s). Doc says 'Absolute' volumeflow (read-only)."
+    },
+    {
+      "name": "Totalizer 1 (double)",
+      "address": 3014,
+      "fc": 3,
+      "type": "float64",
+      "group": "totalizer",
+      "sim": 123.4,
+      "note": "64 bit IEEE double over 4 registers; unit set by 'Totalizer 1 Unit' (4:02913, default m3)."
+    },
+    {
+      "name": "Totalizer 2/Batch (double)",
+      "address": 3018,
+      "fc": 3,
+      "type": "float64",
+      "group": "totalizer",
+      "sim": 12.3,
+      "note": "64 bit double; unit set by 'Totalizer 2 Unit' (4:02915)."
+    },
+    {
+      "name": "Totalizer 1 (float)",
+      "address": 3022,
+      "fc": 3,
+      "type": "float32",
+      "group": "totalizer",
+      "sim": 123.4,
+      "note": "Same value as the double, single precision. Unit as Totalizer 1 (4:02913)."
+    },
+    {
+      "name": "Totalizer 2/Batch (float)",
+      "address": 3024,
+      "fc": 3,
+      "type": "float32",
+      "group": "totalizer",
+      "sim": 12.3,
+      "note": "Single precision. Unit as Totalizer 2 (4:02915)."
+    },
+    {
+      "name": "Volume Flow Unit",
+      "address": 2906,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 63,
+      "group": "config",
+      "enum": {
+        "0": "m3 / s",
+        "1": "ml / s",
+        "2": "L / s",
+        "3": "hl / s",
+        "4": "BBL42 / s",
+        "5": "ML / s",
+        "6": "US bbl / s",
+        "7": "m3 / s",
+        "8": "ft3 / s",
+        "9": "in3 / s",
+        "10": "USGPS",
+        "11": "USMGPS",
+        "12": "UKGPS",
+        "13": "UKMGPS",
+        "14": "USkGPS",
+        "15": "UKkGPS",
+        "16": "m3 / min",
+        "17": "ml / min",
+        "18": "L / min",
+        "19": "hl / min",
+        "20": "BBL42 / min",
+        "21": "ML / min",
+        "22": "bbl / min",
+        "23": "m3 / min",
+        "24": "ft3 / min",
+        "25": "in3 / min",
+        "26": "USGPM",
+        "27": "USMGPM",
+        "28": "UKGPM",
+        "29": "UKMGPM",
+        "30": "USkGPM",
+        "31": "UKkGPM",
+        "32": "m3 / h",
+        "33": "ml / h",
+        "34": "L / h",
+        "35": "hl / h",
+        "36": "BBL42 / h",
+        "37": "ML / h",
+        "38": "bbl / h",
+        "39": "m3 / h",
+        "40": "ft3 / h",
+        "41": "in3 / h",
+        "42": "USGPH",
+        "43": "USMGPH",
+        "44": "UKGPH",
+        "45": "UKMGPH",
+        "46": "USkGPH",
+        "47": "UKkGPH",
+        "48": "m3 / d",
+        "49": "ml / d",
+        "50": "L / d",
+        "51": "hl / d",
+        "52": "BBL42 / d",
+        "53": "ML / d",
+        "54": "bbl / d",
+        "55": "m3 / d",
+        "56": "ft3 / d",
+        "57": "in3 / d",
+        "58": "USGPD",
+        "59": "USMGPD",
+        "60": "UKGPD",
+        "61": "UKMGPD",
+        "62": "USkGPD",
+        "63": "UKkGPD"
+      },
+      "sim": 0,
+      "note": "Register 4:02907 (value in the low byte). Unit settings on Modbus and display are linked: changing it changes the display. The unit IDs were transcribed from a garbled text layer (Table B-2) - re-check the list in the manual."
+    },
+    {
+      "name": "Volume Flow Decimals",
+      "address": 2907,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 6,
+      "group": "config",
+      "enum": {
+        "0": "0 digits after the decimal point",
+        "1": "1 digits after the decimal point",
+        "2": "2 digits after the decimal point",
+        "3": "3 digits after the decimal point",
+        "4": "4 digits after the decimal point",
+        "5": "5 digits after the decimal point",
+        "6": "6 digits after the decimal point"
+      },
+      "sim": 2,
+      "note": "Register 4:02908 (display point position)."
+    },
+    {
+      "name": "Totalizer 1 Unit",
+      "address": 2912,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 15,
+      "group": "config",
+      "enum": {
+        "0": "m3",
+        "1": "ml",
+        "2": "L",
+        "3": "hl",
+        "4": "BBL42",
+        "5": "Ml",
+        "6": "USBBL",
+        "7": "m3",
+        "8": "ft3",
+        "9": "in3",
+        "10": "USG",
+        "11": "USMG",
+        "12": "UKG",
+        "13": "UKMG",
+        "14": "USkG",
+        "15": "UKkG"
+      },
+      "sim": 0,
+      "note": "Register 4:02913. Table B-5 (volume totalizer units; the PDF layout shifts IDs by one row, order used here is 0=m3 ...). Linked with the display."
+    },
+    {
+      "name": "Totalizer 1 Decimals",
+      "address": 2913,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 6,
+      "group": "config",
+      "enum": {
+        "0": "0 digits after the decimal point",
+        "1": "1 digits after the decimal point",
+        "2": "2 digits after the decimal point",
+        "3": "3 digits after the decimal point",
+        "4": "4 digits after the decimal point",
+        "5": "5 digits after the decimal point",
+        "6": "6 digits after the decimal point"
+      },
+      "sim": 2
+    },
+    {
+      "name": "Totalizer 2 Unit",
+      "address": 2914,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 15,
+      "group": "config",
+      "enum": {
+        "0": "m3",
+        "1": "ml",
+        "2": "L",
+        "3": "hl",
+        "4": "BBL42",
+        "5": "Ml",
+        "6": "USBBL",
+        "7": "m3",
+        "8": "ft3",
+        "9": "in3",
+        "10": "USG",
+        "11": "USMG",
+        "12": "UKG",
+        "13": "UKMG",
+        "14": "USkG",
+        "15": "UKkG"
+      },
+      "sim": 0,
+      "note": "Register 4:02915."
+    },
+    {
+      "name": "Totalizer 2 Decimals",
+      "address": 2915,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 6,
+      "group": "config",
+      "enum": {
+        "0": "0 digits after the decimal point",
+        "1": "1 digits after the decimal point",
+        "2": "2 digits after the decimal point",
+        "3": "3 digits after the decimal point",
+        "4": "4 digits after the decimal point",
+        "5": "5 digits after the decimal point",
+        "6": "6 digits after the decimal point"
+      },
+      "sim": 2
+    },
+    {
+      "name": "Flow Direction",
+      "address": 2000,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "Negative",
+        "1": "Positive"
+      },
+      "sim": 1,
+      "note": "Register 4:02001. Changes the sign convention of the flow reading."
+    },
+    {
+      "name": "Q max",
+      "address": 2005,
+      "fc": 3,
+      "type": "float32",
+      "unit": "m3/s",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.05,
+      "note": "Register 4:02006. Full-scale flow in m3/s; affects the scaled outputs. No min/max in the register table (runtime limits at register+10000/+20000)."
+    },
+    {
+      "name": "Q max 2 (Night)",
+      "address": 2007,
+      "fc": 3,
+      "type": "float32",
+      "unit": "m3/s",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.05,
+      "note": "Register 4:02008."
+    },
+    {
+      "name": "Low Flow Cut Off",
+      "address": 2025,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.02,
+      "note": "Register 4:02026. Fraction of Q max: 0.02 = 2 %."
+    },
+    {
+      "name": "Empty Pipe Detection",
+      "address": 2029,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Register 4:02030."
+    },
+    {
+      "name": "Mains Frequency",
+      "address": 2040,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "50 Hz",
+        "1": "60 Hz"
+      },
+      "sim": 0,
+      "note": "Register 4:02041."
+    },
+    {
+      "name": "Totalizer 1 Direction",
+      "address": 2101,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "0": "Reverse",
+        "1": "Forward",
+        "2": "Net"
+      },
+      "sim": 2,
+      "note": "Register 4:02102."
+    },
+    {
+      "name": "Totalizer 2 Direction",
+      "address": 2103,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "0": "Reverse",
+        "1": "Forward",
+        "2": "Net"
+      },
+      "sim": 2,
+      "note": "Register 4:02104."
+    },
+    {
+      "name": "Reset Totalizer 1",
+      "address": 9,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "No effect",
+        "1": "Reset"
+      },
+      "sim": 0,
+      "note": "Coil 0:00010 (write 1 to reset, reads always 0). DESTROYS THE ACCUMULATED TOTAL."
+    },
+    {
+      "name": "Hold Totalizer 1",
+      "address": 10,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Run",
+        "1": "Hold"
+      },
+      "sim": 0,
+      "note": "Coil 0:00011."
+    },
+    {
+      "name": "Reset Totalizer 2",
+      "address": 11,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "No effect",
+        "1": "Reset"
+      },
+      "sim": 0,
+      "note": "Coil 0:00012. DESTROYS THE ACCUMULATED TOTAL / BATCH VALUE."
+    },
+    {
+      "name": "Hold Totalizer 2",
+      "address": 12,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Run",
+        "1": "Hold"
+      },
+      "sim": 0,
+      "note": "Coil 0:00013."
+    },
+    {
+      "name": "Product Code",
+      "address": 602,
+      "fc": 3,
+      "type": "uint16",
+      "group": "info",
+      "enum": {
+        "24": "MAG 6000",
+        "25": "MASS 6000"
+      },
+      "sim": 24,
+      "note": "Register 4:00603 (low byte)."
+    },
+    {
+      "name": "Flowmeter Revision",
+      "address": 605,
+      "fc": 3,
+      "type": "uint16",
+      "group": "info",
+      "sim": 513,
+      "note": "Register 4:00606; e.g. 0x0201 = v2.01 (hex-coded)."
+    },
+    {
+      "name": "MODBUS Revision",
+      "address": 606,
+      "fc": 3,
+      "type": "uint16",
+      "group": "info",
+      "sim": 513,
+      "note": "Register 4:00607; e.g. 0x0201 = v2.01."
+    },
+    {
+      "name": "Parity Errors",
+      "address": 500,
+      "fc": 3,
+      "type": "uint16",
+      "group": "diagnostic",
+      "sim": 0,
+      "note": "Register 4:00501."
+    },
+    {
+      "name": "Framing Errors",
+      "address": 501,
+      "fc": 3,
+      "type": "uint16",
+      "group": "diagnostic",
+      "sim": 0,
+      "note": "Register 4:00502."
+    },
+    {
+      "name": "CRC Errors",
+      "address": 503,
+      "fc": 3,
+      "type": "uint16",
+      "group": "diagnostic",
+      "sim": 0,
+      "note": "Register 4:00504."
+    },
+    {
+      "name": "OK Messages Received",
+      "address": 504,
+      "fc": 3,
+      "type": "uint16",
+      "group": "diagnostic",
+      "sim": 0,
+      "note": "Register 4:00505."
+    },
+    {
+      "name": "Device Address",
+      "address": 528,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "sim": 1,
+      "note": "Register 4:00529. Factory setting 1. Writing it moves the device off the current address."
+    },
+    {
+      "name": "Baud Rate",
+      "address": 529,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 8,
+      "group": "config",
+      "enum": {
+        "0": "1200",
+        "1": "2400",
+        "2": "4800",
+        "3": "9600",
+        "4": "19200",
+        "5": "38400",
+        "6": "57600",
+        "7": "76800",
+        "8": "115200"
+      },
+      "sim": 4,
+      "note": "Register 4:00530. Factory setting 19200. Writing it changes the speed and drops the connection."
+    },
+    {
+      "name": "Parity/Framing",
+      "address": 530,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "8,E,1",
+        "1": "8,O,1",
+        "2": "8,N,2",
+        "3": "8,N,1"
+      },
+      "sim": 0,
+      "note": "Register 4:00531. Factory setting Even, 1 stop bit."
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+ "name": "Schneider Electric Altivar 12 (ATV12) Modbus RTU",
+ "manufacturer": "Schneider Electric",
+ "model": "Altivar 12 (ATV12)",
+ "verified": false,
+ "source": [
+  "https://download.se.com/files?p_Doc_Ref=BBV28590&p_enDocType=User+guide&p_File_Name=ATV12_Modbus_EN_BBV28590_02.pdf",
+  "https://www.se.com/jp/ja/download/document/BBV28590"
+ ],
+ "doc_revision": "Altivar 12 Variable speed drives for asynchronous motors, Modbus Communication Manual, BBV28590 06/2012 (version 02)",
+ "notes": "Built from the Schneider manual above (PDF text read locally); NOT verified on a physical drive. Addressing: the manual uses decimal 'W' word addresses directly as the Modbus data address (e.g. ETA W3201, CMD W8501, parameter 16#1771 = 06001, scanner 16#31C5 = 12741), so address_base is 0 and 'address' is the number printed in the manual. This manual only documents the communication parameters, the CiA402-style command/status words and the I/O scanner; it says the full list of Modbus addresses is in the separate parameter-address spreadsheet (BBV51917), which was NOT read. Hence there are no output current / fault code points here. Addresses 8602 (LFRD) and 8604 (RFRD) come from the scanner factory-assignment table of this manual; their engineering unit/scaling is not stated there. Factory communication settings (table columns are jumbled in the PDF text, read in order): address OFF (must be set 1..247), 19.2 kbps, 8E1, time-out 10 s. The 'connection' unit 1 is a placeholder because the drive address is OFF from the factory. Supported functions are 03, 06, 16 and 23 per the manual; communication parameter changes take effect after power cycle (this statement is from the sibling ATV320 manual; for ATV12 treat as unconfirmed). CMD (8501) bits: b0 Switch on, b1 Disable voltage (active at 0), b2 Quick stop (active at 0), b3 Enable operation, b4 free-wheel stop staying in Operation Enabled, b7 fault reset on 0->1 transition, b8 0 = RUN asked / 1 = STOP asked, b11 direction 0 forward / 1 reverse. Example command values from the manual: 0006h Shutdown, 0007h Switch on or Disable operation, 000Fh (xxxF) Enable operation, 0000h Disable voltage, 0002h Quick stop, 0080h Fault reset. ETA (3201) bits: b0 Ready to switch on, b1 Switched on, b2 Operation enabled, b3 Fault detection, b4 Voltage enabled (always on), b5 Quick stop (active at 0), b6 Switch on disabled, b9 Local mode (active at 0), b10 Reference reached, b11 Reference exceeded (< LSP or > HSP), b14 Stop via STOP key, b15 0 = motor forward (or stopped). State values (ETA masked by 006Fh): 0050h Switch on disabled, 0031h Ready to switch on, 0033h Switched on, 0037h Operation enabled, 0017h Quick stop active, 0018h or 0038h Fault. SAFETY: CMD and LFRD (group 'control') start/stop/speed-command a real motor; they are rw because the manual defines them as command/reference words. No min/max is given for LFRD in the manual read, so none is enforced. If Modbus fault management (SLL) = ignore, the manual warns that communication control is inhibited (loss of control).",
+ "connection": {
+  "type": "rtu",
+  "baud": 19200,
+  "parity": "E",
+  "stop": 1,
+  "data": 8,
+  "unit": 1,
+  "timeout": 1.0
+ },
+ "address_base": 0,
+ "points": [
+  {
+   "name": "ETA Status Word",
+   "address": 3201,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "enum": {
+    "1591": "Stop or forward, speed reached (0637h)",
+    "34359": "Stop or reverse, speed reached (8637h)",
+    "567": "Forward, accelerating or decelerating (0237h)",
+    "33335": "Reverse, accelerating or decelerating (8237h)"
+   },
+   "sim": 1591,
+   "note": "Drivecom status word; enum lists only the example full values printed in the manual's state chart."
+  },
+  {
+   "name": "CMD Command Word",
+   "address": 8501,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "enum": {
+    "0": "Disable voltage",
+    "2": "Quick stop",
+    "6": "Shutdown",
+    "7": "Switch on / Disable operation",
+    "15": "Enable operation (xxxF)",
+    "128": "Fault reset"
+   },
+   "sim": 0,
+   "note": "Drivecom control word. COMMANDS REAL MACHINERY."
+  },
+  {
+   "name": "LFRD Speed Reference",
+   "address": 8602,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "sim": 0,
+   "note": "Reference value (scanner factory target). Unit/scaling not stated in manual read. COMMANDS REAL MACHINERY."
+  },
+  {
+   "name": "RFRD Output Speed",
+   "address": 8604,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Scanner factory source value; unit/scaling not stated in manual read."
+  },
+  {
+   "name": "EtI Extended Status Word",
+   "address": 3206,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "Address from the manual's scanner configuration example (EtI = Modbus 3206); bit meanings not in manual read."
+  },
+  {
+   "name": "Add Modbus Address",
+   "address": 6001,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "min": 0,
+   "max": 247,
+   "group": "config",
+   "enum": {
+    "0": "OFF"
+   },
+   "sim": 1,
+   "note": "0 = OFF (broadcast only), 1..247. Factory OFF."
+  },
+  {
+   "name": "tbr Modbus Baud Rate (raw)",
+   "address": 6003,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "4.8 / 9.6 / 19.2 / 38.4 kbps, factory 19.2; numeric coding not given in ATV12 manual (the ATV320 manual uses 24/28/32/36 but this is not confirmed for ATV12)."
+  },
+  {
+   "name": "tFO Modbus Format (raw)",
+   "address": 6004,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "8O1 / 8E1 / 8N1 / 8N2, factory 8E1; numeric coding not given in ATV12 manual."
+  },
+  {
+   "name": "ttO Modbus Time-out (raw)",
+   "address": 6005,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "0.1 to 30 s, factory 10 s; raw scaling not given in ATV12 manual."
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+mbtool_settings.json
+*.mbw
+*.log
+mbtool_*.csv
+.venv/
+dist/
+dist/
+build/

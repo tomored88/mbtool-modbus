@@ -1,0 +1,187 @@
+{
+ "name": "Schneider Electric Altivar Machine 320 (ATV320) Modbus RTU",
+ "manufacturer": "Schneider Electric",
+ "model": "Altivar Machine 320 (ATV320)",
+ "verified": false,
+ "source": [
+  "https://download.se.com/files?p_Doc_Ref=NVE41308&p_enDocType=User+guide&p_File_Name=ATV320_Modbus_manual_EN_NVE41308_01.pdf",
+  "https://www.se.com/us/en/download/document/NVE41308"
+ ],
+ "doc_revision": "Altivar Machine 320 Variable Speed Drives for Synchronous and Asynchronous Motors, Modbus Serial Link Manual, NVE41308 04/2016 (file version 01)",
+ "notes": "Built from the Schneider manual above (PDF text read locally); NOT verified on a physical drive. Addressing: the manual's own example reads parameters W3102..W3105 with request address 0C1E hex = 3102, i.e. printed decimal addresses are the Modbus data addresses, so address_base is 0. This Modbus manual does NOT list the native CMD/ETA/LFRD addresses (those are in the ATV320 programming manual / parameter spreadsheet, not read). It does document the I/O communication scanner images, used here: input scanner values nM1..nM2 at 12741-12742 (factory: ETA status word, RFRD output speed) and output scanner values nC1..nC2 at 12761-12762 (factory: CMD command word, LFRD speed target). These four points only carry ETA/RFRD/CMD/LFRD while the scanner assignments nMA1/nMA2/nCA1/nCA2 (12701, 12702, 12721, 12722) are at their factory values; read those config registers to confirm. Scanner value units/scaling are not stated. Communication parameters: Add 6001 (OFF or 1..247, factory OFF), tbr 6003 (24=4800, 28=9600, 32=19200, 36=38400; factory 19.2 kbps), tFO 6004 (2=8O1, 3=8E1, 4=8N1, 5=8N2; factory 8E1), tto 6005 (raw 1..300 = 0.1..30.0 s; factory 10 s). Modbus counters: M1EC (CRC errors) 6010, M1Ct (frame count) 6011. Changes of the communication parameters are taken into account after a power cycle (manual). The 'connection' unit 1 is a placeholder because the factory address is OFF. Supported functions: 03, 06, 16 (10h), 23 (17h). CiA402 command values from the manual (CMD): 0006h Shutdown, 0007h Switch on or Disable operation, 000Fh Enable operation, 0000h Disable voltage, 0002h Quick stop, 0080h Fault reset (bit 7 rising edge). ETA bits: b0 Ready to switch on, b1 Switched on, b2 Operation enabled, b3 Fault, b4 Voltage enabled, b5 Quick stop (0 = active), b6 Switch on disabled, b7 Warning, b9 Remote (command/reference via fieldbus), b10 Target reached, b11 Internal limit active, b14 Stop via STOP key, b15 Direction of rotation. ETA masked by 006Fh: 0040h Switch on disabled, 0021h Ready to switch on, 0023h Switched on, 0027h Operation enabled, 0007h Quick stop active, 0008h or 0028h Fault. SAFETY: nC1 (CMD) and nC2 (LFRD) in group 'control' start/stop/speed-command a real motor; marked rw because the manual defines them as writable scanner outputs. The drive only starts after reference and command have each been written at least once from the communication channel (manual). No min/max for LFRD in the manual read, so none is enforced. A Modbus time-out (ttO) without requests triggers fault SLF1 (manual).",
+ "connection": {
+  "type": "rtu",
+  "baud": 19200,
+  "parity": "E",
+  "stop": 1,
+  "data": 8,
+  "unit": 1,
+  "timeout": 1.0
+ },
+ "address_base": 0,
+ "points": [
+  {
+   "name": "nM1 Scanner In1: ETA Status Word",
+   "address": 12741,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 33,
+   "note": "Factory assignment ETA (CiA402 status word); valid while nMA1 is at factory value."
+  },
+  {
+   "name": "nM2 Scanner In2: RFRD Output Speed",
+   "address": 12742,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Factory assignment RFRD; unit not stated."
+  },
+  {
+   "name": "nC1 Scanner Out1: CMD Command Word",
+   "address": 12761,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "enum": {
+    "0": "Disable voltage",
+    "2": "Quick stop",
+    "6": "Shutdown",
+    "7": "Switch on / Disable operation",
+    "15": "Enable operation",
+    "128": "Fault reset"
+   },
+   "sim": 0,
+   "note": "Factory assignment CMD. COMMANDS REAL MACHINERY."
+  },
+  {
+   "name": "nC2 Scanner Out2: LFRD Speed Target",
+   "address": 12762,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "sim": 0,
+   "note": "Factory assignment LFRD; unit not stated. COMMANDS REAL MACHINERY."
+  },
+  {
+   "name": "nMA1 Scanner In1 Source Address",
+   "address": 12701,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "Factory: address of ETA (value not printed in the manual)."
+  },
+  {
+   "name": "nMA2 Scanner In2 Source Address",
+   "address": 12702,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "Factory: address of RFRD."
+  },
+  {
+   "name": "nCA1 Scanner Out1 Destination Address",
+   "address": 12721,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "Factory: address of CMD."
+  },
+  {
+   "name": "nCA2 Scanner Out2 Destination Address",
+   "address": 12722,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "note": "Factory: address of LFRD."
+  },
+  {
+   "name": "Add Modbus Address",
+   "address": 6001,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "min": 0,
+   "max": 247,
+   "group": "config",
+   "enum": {
+    "0": "OFF"
+   },
+   "sim": 1,
+   "note": "0 = OFF, 1..247, factory OFF."
+  },
+  {
+   "name": "tbr Modbus Baud Rate",
+   "address": 6003,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "enum": {
+    "24": "4800 bps",
+    "28": "9600 bps",
+    "32": "19200 bps",
+    "36": "38400 bps"
+   },
+   "sim": 32,
+   "note": "Factory 19.2 kbps."
+  },
+  {
+   "name": "tFO Modbus Format",
+   "address": 6004,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "enum": {
+    "2": "8-O-1",
+    "3": "8-E-1",
+    "4": "8-N-1",
+    "5": "8-N-2"
+   },
+   "sim": 3,
+   "note": "Factory 8E1."
+  },
+  {
+   "name": "tto Modbus Time-out",
+   "address": 6005,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.1,
+   "unit": "s",
+   "access": "r",
+   "min": 0.1,
+   "max": 30.0,
+   "group": "config",
+   "sim": 10.0,
+   "note": "Raw 1..300; factory 10 s."
+  },
+  {
+   "name": "M1EC Modbus CRC Errors",
+   "address": 6010,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "Stays at 65535 once reached."
+  },
+  {
+   "name": "M1Ct Modbus Frame Count",
+   "address": 6011,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "note": "Modulo 65536 counter of frames addressed to the drive."
+  }
+ ]
+}

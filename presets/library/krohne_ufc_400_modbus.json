@@ -1,0 +1,796 @@
+{
+  "device_type": "flow",
+  "name": "KROHNE UFC 400 (ultrasonic flow converter) Modbus RTU",
+  "manufacturer": "KROHNE",
+  "model": "UFC 400 signal converter for ultrasonic flowmeters (Modbus, ER 2.2.0 / Modbus 2.1.0)",
+  "source": [
+    "https://core.instrumart.com/assets/Krohne-UFC-400-Modbus-Manual.pdf"
+  ],
+  "doc_revision": "KROHNE 05/2013 - 4002744801 - AD Modbus UFC 400 R01 en; electronic revision ER 2.2.0, Modbus version 2.1.0",
+  "verified": false,
+  "notes": "Addressing: the manual states the converter uses protocol addresses (example: input register 30006 has start address 30006 = 0x7536), so address_base=0 and the listed numbers are used unchanged (FC04 for the 3xxxx/20000+ input registers, FC03/16 for 4xxxx/5xxxx holding registers, FC01/05 for coils at 0..9999, FC02 for discrete inputs 10000+). Note the unusual ranges: holding registers go up to 52023. Default RS485 settings (menu C5.8): address 1, 19200 bps, even parity, 1 stop bit, big endian (matches the connection block). Multi-register values (float, double, long) follow the 'Register Format' setting (50006); this preset assumes Big Endian (word_order big). Configuration written to holding registers only takes effect after 'Apply Changes' (coil 1002) and can be dropped with 'Discard Changes' (1003). The manual's holding-register tables use merged 'Type' cells; the totaliser 'Time constant / Set or read value / Preset' and the process-input 'Time constant' rows are modelled as float32 because their register stride is 2 (type cell not repeated). 'Long' (baud rate, NE 107 groups) is modelled as unsigned 32 bit (signedness not stated). Totaliser 3 (modular-carrier converters only) and the C1.x calibration constants (GK, limitation min/max, dynamic viscosity, plausibility) are not included. Deliberately left out as dangerous: coil 1000 Restart Device, coil 1004 Reset to Factory Data, coil 2000 Zero Calibration Start (the manual says only trained service engineers should zero-calibrate). Documented as plain register writes but they affect the measurement/accounting: totaliser resets, set value, low-flow cut-off, flow direction, density, apply changes. NE107 event-group status registers 52017-52023 and the 'Zero calibration result' input register were not modelled.",
+  "connection": {
+    "type": "rtu",
+    "baud": 19200,
+    "parity": "E",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Flow Velocity",
+      "address": 30000,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "measure",
+      "sim": 1.5,
+      "note": "Float, FC04."
+    },
+    {
+      "name": "Volume Flow",
+      "address": 30002,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m3/s",
+      "group": "measure",
+      "sim": 0.02,
+      "note": "Float, FC04."
+    },
+    {
+      "name": "Mass Flow",
+      "address": 30004,
+      "fc": 4,
+      "type": "float32",
+      "unit": "kg/s",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "Float, FC04."
+    },
+    {
+      "name": "Velocity of Sound",
+      "address": 30006,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "measure",
+      "sim": 1480.0,
+      "note": "Float, FC04."
+    },
+    {
+      "name": "Gain",
+      "address": 30008,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "measure",
+      "sim": 40.0,
+      "note": "Float, FC04."
+    },
+    {
+      "name": "Signal Noise Ratio",
+      "address": 30010,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "measure",
+      "sim": 35.0,
+      "note": "Float, FC04."
+    },
+    {
+      "name": "Diagnosis 1",
+      "address": 30012,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "Float, FC04. Content depends on the selector registers 41002/41003 (Diagnostics 1/2 selector)."
+    },
+    {
+      "name": "Diagnosis 2",
+      "address": 30014,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "Float, FC04. Content depends on the selector registers 41002/41003 (Diagnostics 1/2 selector)."
+    },
+    {
+      "name": "NE107 Status Flow Velocity",
+      "address": 30500,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit-coded byte: bit7 Failure, bit5 Out of spec, bit4 Function check, bit3 Initial value, bit2 Maintenance, bit1 Value too large and limited, bit0 Value too small and limited. 0 = no message."
+    },
+    {
+      "name": "NE107 Status Volume Flow",
+      "address": 30501,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit-coded byte: bit7 Failure, bit5 Out of spec, bit4 Function check, bit3 Initial value, bit2 Maintenance, bit1 Value too large and limited, bit0 Value too small and limited. 0 = no message."
+    },
+    {
+      "name": "NE107 Status Mass Flow",
+      "address": 30502,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit-coded byte: bit7 Failure, bit5 Out of spec, bit4 Function check, bit3 Initial value, bit2 Maintenance, bit1 Value too large and limited, bit0 Value too small and limited. 0 = no message."
+    },
+    {
+      "name": "NE107 Status Velocity of Sound",
+      "address": 30503,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit-coded byte: bit7 Failure, bit5 Out of spec, bit4 Function check, bit3 Initial value, bit2 Maintenance, bit1 Value too large and limited, bit0 Value too small and limited. 0 = no message."
+    },
+    {
+      "name": "NE107 Status Gain",
+      "address": 30504,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit-coded byte: bit7 Failure, bit5 Out of spec, bit4 Function check, bit3 Initial value, bit2 Maintenance, bit1 Value too large and limited, bit0 Value too small and limited. 0 = no message."
+    },
+    {
+      "name": "NE107 Status Signal Noise Ratio",
+      "address": 30505,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit-coded byte: bit7 Failure, bit5 Out of spec, bit4 Function check, bit3 Initial value, bit2 Maintenance, bit1 Value too large and limited, bit0 Value too small and limited. 0 = no message."
+    },
+    {
+      "name": "Velocity of Sound Path 1",
+      "address": 31000,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Velocity of Sound Path 2",
+      "address": 31002,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Velocity of Sound Path 3",
+      "address": 31004,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Flow Speed Path 1",
+      "address": 31006,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Flow Speed Path 2",
+      "address": 31008,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Flow Speed Path 3",
+      "address": 31010,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m/s",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Gain Path 1",
+      "address": 31012,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Gain Path 2",
+      "address": 31014,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Gain Path 3",
+      "address": 31016,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "SNR Path 1",
+      "address": 31018,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "SNR Path 2",
+      "address": 31020,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "SNR Path 3",
+      "address": 31022,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Reynolds Number",
+      "address": 31024,
+      "fc": 4,
+      "type": "float32",
+      "group": "auxiliary",
+      "sim": 100000.0
+    },
+    {
+      "name": "Reynolds Correction",
+      "address": 31026,
+      "fc": 4,
+      "type": "float32",
+      "group": "auxiliary",
+      "sim": 1.0
+    },
+    {
+      "name": "Device Operation Time",
+      "address": 39002,
+      "fc": 4,
+      "type": "float32",
+      "unit": "s",
+      "group": "info",
+      "sim": 1000.0
+    },
+    {
+      "name": "NE107 Status Groups",
+      "address": 39004,
+      "fc": 4,
+      "type": "uint32",
+      "group": "status",
+      "sim": 0,
+      "note": "32 bit bitfield, layout in Appendix 8.1 of the manual (byte0 = F/C bits, byte1 = S/M bits, byte2/3 = event groups). Signedness of 'Long' not stated; read as unsigned."
+    },
+    {
+      "name": "NE107 Device Status",
+      "address": 39100,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bit7 Failure, bit5 Out of spec, bit4 Function check, bit2 Maintenance, bit0 Information."
+    },
+    {
+      "name": "Totaliser 1 Value (double)",
+      "address": 32000,
+      "fc": 4,
+      "type": "float64",
+      "group": "totalizer",
+      "sim": 100.0,
+      "note": "Unit m3 or kg depending on the 'Measurement' selection of the totaliser (40001/40003)."
+    },
+    {
+      "name": "Totaliser 1 Value (float)",
+      "address": 32100,
+      "fc": 4,
+      "type": "float32",
+      "group": "totalizer",
+      "sim": 100.0,
+      "note": "Single precision copy of the same value."
+    },
+    {
+      "name": "Totaliser 2 Value (double)",
+      "address": 32004,
+      "fc": 4,
+      "type": "float64",
+      "group": "totalizer",
+      "sim": 100.0,
+      "note": "Unit m3 or kg depending on the 'Measurement' selection of the totaliser (40001/40003)."
+    },
+    {
+      "name": "Totaliser 2 Value (float)",
+      "address": 32102,
+      "fc": 4,
+      "type": "float32",
+      "group": "totalizer",
+      "sim": 100.0,
+      "note": "Single precision copy of the same value."
+    },
+    {
+      "name": "Unsaved Changes",
+      "address": 10001,
+      "fc": 2,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "No changes",
+        "1": "Unsaved changes"
+      },
+      "sim": 0,
+      "note": "Discrete input 10001 (FC02)."
+    },
+    {
+      "name": "Totaliser 1 Run",
+      "address": 3000,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Stopped",
+        "1": "Running"
+      },
+      "sim": 1,
+      "note": "Coil 3000: write 0 stop / 1 start; read returns status. Stopping a totaliser affects accounting."
+    },
+    {
+      "name": "Totaliser 1 Reset",
+      "address": 3003,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Idle",
+        "1": "Reset"
+      },
+      "sim": 0,
+      "note": "Coil 3003: write 1 to set the totaliser value to zero. DESTROYS THE ACCUMULATED TOTAL."
+    },
+    {
+      "name": "Totaliser 2 Run",
+      "address": 3001,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Stopped",
+        "1": "Running"
+      },
+      "sim": 1,
+      "note": "Coil 3001: write 0 stop / 1 start; read returns status. Stopping a totaliser affects accounting."
+    },
+    {
+      "name": "Totaliser 2 Reset",
+      "address": 3004,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Idle",
+        "1": "Reset"
+      },
+      "sim": 0,
+      "note": "Coil 3004: write 1 to set the totaliser value to zero. DESTROYS THE ACCUMULATED TOTAL."
+    },
+    {
+      "name": "Reset Errors",
+      "address": 1001,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Idle",
+        "1": "Reset"
+      },
+      "sim": 0,
+      "note": "Coil 1001: write 1 clears the system error flags."
+    },
+    {
+      "name": "Apply Changes",
+      "address": 1002,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Idle",
+        "1": "Apply"
+      },
+      "sim": 0,
+      "note": "Coil 1002: write 1 to apply holding-register configuration changes (required before they take effect). Applying changes can change the measurement."
+    },
+    {
+      "name": "Discard Changes",
+      "address": 1003,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "control",
+      "enum": {
+        "0": "Idle",
+        "1": "Discard"
+      },
+      "sim": 0,
+      "note": "Coil 1003: write 1 to discard unapplied changes."
+    },
+    {
+      "name": "Totaliser 1 Function",
+      "address": 40000,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "Off",
+        "1": "Absolute total",
+        "2": "Increment",
+        "3": "Decrement"
+      },
+      "sim": 1,
+      "note": "Needs 'Apply Changes' (coil 1002) to take effect."
+    },
+    {
+      "name": "Totaliser 1 Measurement",
+      "address": 40001,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "0": "Volume flow",
+        "2": "Mass flow"
+      },
+      "sim": 0,
+      "note": "Value 1 is not defined. Needs 'Apply Changes'."
+    },
+    {
+      "name": "Totaliser 2 Function",
+      "address": 40002,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "Off",
+        "1": "Absolute total",
+        "2": "Increment",
+        "3": "Decrement"
+      },
+      "sim": 1,
+      "note": "Needs 'Apply Changes' (coil 1002) to take effect."
+    },
+    {
+      "name": "Totaliser 2 Measurement",
+      "address": 40003,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "0": "Volume flow",
+        "2": "Mass flow"
+      },
+      "sim": 0,
+      "note": "Value 1 is not defined. Needs 'Apply Changes'."
+    },
+    {
+      "name": "Totaliser 1 Low Flow Cut-Off",
+      "address": 40500,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "Unit m3/s or kg/s depending on the totaliser measurement. Needs 'Apply Changes'."
+    },
+    {
+      "name": "Totaliser 1 Time Constant",
+      "address": 40502,
+      "fc": 3,
+      "type": "float32",
+      "unit": "s",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "Documented range 0...100 s. The type column of the manual is merged for this row group: float (2 registers) inferred from the 2-register address stride."
+    },
+    {
+      "name": "Totaliser 1 Set or Read Value",
+      "address": 40504,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "control",
+      "sim": 0.0,
+      "note": "Unit m3 or kg. Writing sets the totaliser value - AFFECTS THE ACCUMULATED TOTAL. Float type inferred from the register stride."
+    },
+    {
+      "name": "Totaliser 1 Preset",
+      "address": 40506,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "Unit m3 or kg. Float type inferred from the register stride."
+    },
+    {
+      "name": "Totaliser 2 Low Flow Cut-Off",
+      "address": 40508,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "Unit m3/s or kg/s depending on the totaliser measurement. Needs 'Apply Changes'."
+    },
+    {
+      "name": "Totaliser 2 Time Constant",
+      "address": 40510,
+      "fc": 3,
+      "type": "float32",
+      "unit": "s",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "Documented range 0...100 s. The type column of the manual is merged for this row group: float (2 registers) inferred from the 2-register address stride."
+    },
+    {
+      "name": "Totaliser 2 Set or Read Value",
+      "address": 40512,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "control",
+      "sim": 0.0,
+      "note": "Unit m3 or kg. Writing sets the totaliser value - AFFECTS THE ACCUMULATED TOTAL. Float type inferred from the register stride."
+    },
+    {
+      "name": "Totaliser 2 Preset",
+      "address": 40514,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "Unit m3 or kg. Float type inferred from the register stride."
+    },
+    {
+      "name": "Flow Direction",
+      "address": 41000,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "Normal",
+        "1": "Reverse"
+      },
+      "sim": 0,
+      "note": "Needs 'Apply Changes'."
+    },
+    {
+      "name": "Linearization",
+      "address": 41001,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "Off",
+        "1": "On"
+      },
+      "sim": 0,
+      "note": "Needs 'Apply Changes'."
+    },
+    {
+      "name": "Diagnostics 1 Selector",
+      "address": 41002,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "config",
+      "sim": 0,
+      "enum": {
+        "0": "Off",
+        "415": "Velocity of sound path 1",
+        "416": "Velocity of sound path 2",
+        "417": "Velocity of sound path 3",
+        "421": "Flow speed path 1",
+        "422": "Flow speed path 2",
+        "423": "Flow speed path 3"
+      }
+    },
+    {
+      "name": "Diagnostics 2 Selector",
+      "address": 41003,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "config",
+      "sim": 0,
+      "enum": {
+        "0": "Off",
+        "402": "Gain path 1",
+        "403": "Gain path 2",
+        "404": "Gain path 3",
+        "409": "SNR path 1",
+        "410": "SNR path 2",
+        "411": "SNR path 3"
+      }
+    },
+    {
+      "name": "Time Constant",
+      "address": 41508,
+      "fc": 3,
+      "type": "float32",
+      "unit": "s",
+      "access": "rw",
+      "group": "config",
+      "sim": 1.0,
+      "note": "Display function C1.3.3. Needs 'Apply Changes'. Type not stated in the merged table cell; float inferred from the 2-register stride."
+    },
+    {
+      "name": "Low Flow Cutoff Threshold",
+      "address": 41510,
+      "fc": 3,
+      "type": "float32",
+      "unit": "m/s",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.05,
+      "note": "Needs 'Apply Changes'. Affects the measurement."
+    },
+    {
+      "name": "Low Flow Cutoff Hysteresis",
+      "address": 41512,
+      "fc": 3,
+      "type": "float32",
+      "unit": "m/s",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.01,
+      "note": "Needs 'Apply Changes'. Affects the measurement."
+    },
+    {
+      "name": "Pipe Temperature",
+      "address": 41518,
+      "fc": 3,
+      "type": "float32",
+      "unit": "K",
+      "access": "rw",
+      "group": "config",
+      "sim": 293.15
+    },
+    {
+      "name": "Density",
+      "address": 41520,
+      "fc": 3,
+      "type": "float32",
+      "unit": "kg/m3",
+      "access": "rw",
+      "group": "config",
+      "sim": 998.0,
+      "note": "Used for the mass flow calculation."
+    },
+    {
+      "name": "Baud Rate",
+      "address": 50000,
+      "fc": 3,
+      "type": "uint32",
+      "unit": "bps",
+      "access": "rw",
+      "group": "config",
+      "sim": 19200,
+      "note": "Long (2 registers). Documented values 1200, 2400, 3600, 4800, 9600, 19200 (default), 38400, 57600, 115200. Writing drops the connection. Needs 'Apply Changes'."
+    },
+    {
+      "name": "Slave Address",
+      "address": 50004,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "sim": 1,
+      "note": "Default 1. Writing moves the device off the current address."
+    },
+    {
+      "name": "Parity",
+      "address": 50005,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "0": "Even (default)",
+        "1": "Odd",
+        "3": "Off"
+      },
+      "sim": 0
+    },
+    {
+      "name": "Register Format",
+      "address": 50006,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "Little endian",
+        "1": "Big endian (default)"
+      },
+      "sim": 1,
+      "note": "Byte/word order of ALL multi-register values. This preset assumes big endian (1). The manual's little-endian layout mixes byte positions and cannot be expressed here."
+    },
+    {
+      "name": "Stop Bits",
+      "address": 50007,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "1": "1 stop bit (default)",
+        "2": "2 stop bits"
+      },
+      "sim": 1
+    }
+  ]
+}

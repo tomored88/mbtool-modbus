@@ -1,0 +1,389 @@
+{
+  "name": "Advantech ADAM-4150 (7DI/8DO, Modbus RTU)",
+  "manufacturer": "Advantech",
+  "model": "ADAM-4150",
+  "source": [
+    "https://downloads.psl.noaa.gov/psd3/cruises/PISTON_2019/Sally_Ride/SCS/Sally_Met_Manual/Adam/ADAM_4100.pdf"
+  ],
+  "doc_revision": "ADAM 4100 Series Industrial Grade Data Acquisition Modules User's Manual (c) 2005, Appendix B.3 'ADAM-4150 Digital Input/Output Module'",
+  "verified": false,
+  "notes": "Appendix B.3 lists reference numbers 'ADDR 0X' (00001, 00017, 00033 ...) and 4X (40001, 40301, 40303). The manual does not explicitly state whether the protocol address is the number or number-1. Assumption: standard Modbus reference numbering, i.e. 1-based, so address_base=1 and protocol address = number - 1 (00001 -> 0, 00017 -> 16, 40301 -> holding 300). If the module does not answer, try address_base 0. DI signals are listed under 'ADDR 0X' (coil table), so FC01 is used (FC02 is not documented for this module in the manual). DO signals 00017-00024 have attribute 'W' in the table; marked rw because they are output coils. Counter registers 40001-40014 are 7 channels x 32 bits (attribute R); word order not stated. Counter Start/Stop coils are 00033,00037,...,00057 (4 coils per channel: start/stop, clear counter, clear overflow, latch status) - extracted from a table with a partly ambiguous layout, so only start/stop is modelled. Pulse output / DI filter / DO delay registers (40015-40155) and module name/version (40211-40216) are omitted. Modbus RTU is NOT the factory default: the manual says ADAM-4100 modules may ship with ADAM ASCII protocol and must be switched to Modbus with the ADAM utility (Appendix G). Initial COM settings quoted in Appendix G: 9600 baud, N-8-1. Default slave address is not stated for Modbus mode (INIT* state address 00h is for ASCII mode), so no unit is given.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "timeout": 1.0
+  },
+  "address_base": 1,
+  "points": [
+    {
+      "name": "DI 0 Signal",
+      "address": 1,
+      "fc": 1,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 1 Signal",
+      "address": 2,
+      "fc": 1,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 2 Signal",
+      "address": 3,
+      "fc": 1,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 3 Signal",
+      "address": 4,
+      "fc": 1,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 4 Signal",
+      "address": 5,
+      "fc": 1,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 5 Signal",
+      "address": 6,
+      "fc": 1,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 6 Signal",
+      "address": 7,
+      "fc": 1,
+      "type": "bool",
+      "group": "input",
+      "enum": {
+        "0": "Low",
+        "1": "High"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DO 0 Signal",
+      "address": 17,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DO 1 Signal",
+      "address": 18,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DO 2 Signal",
+      "address": 19,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DO 3 Signal",
+      "address": 20,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DO 4 Signal",
+      "address": 21,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DO 5 Signal",
+      "address": 22,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DO 6 Signal",
+      "address": 23,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DO 7 Signal",
+      "address": 24,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "output",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Manual attribute is 'W'; read-back not documented."
+    },
+    {
+      "name": "DI 0 Counter Start/Stop",
+      "address": 33,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "counter",
+      "enum": {
+        "0": "STOP",
+        "1": "START"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 1 Counter Start/Stop",
+      "address": 37,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "counter",
+      "enum": {
+        "0": "STOP",
+        "1": "START"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 2 Counter Start/Stop",
+      "address": 41,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "counter",
+      "enum": {
+        "0": "STOP",
+        "1": "START"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 3 Counter Start/Stop",
+      "address": 45,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "counter",
+      "enum": {
+        "0": "STOP",
+        "1": "START"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 4 Counter Start/Stop",
+      "address": 49,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "counter",
+      "enum": {
+        "0": "STOP",
+        "1": "START"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 5 Counter Start/Stop",
+      "address": 53,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "counter",
+      "enum": {
+        "0": "STOP",
+        "1": "START"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI 6 Counter Start/Stop",
+      "address": 57,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "counter",
+      "enum": {
+        "0": "STOP",
+        "1": "START"
+      },
+      "sim": 0
+    },
+    {
+      "name": "DI Data in Word",
+      "address": 40301,
+      "fc": 3,
+      "type": "uint16",
+      "group": "input",
+      "sim": 0
+    },
+    {
+      "name": "DO Data in Word",
+      "address": 40303,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "output",
+      "sim": 0
+    },
+    {
+      "name": "DI 0 Counter",
+      "address": 40001,
+      "fc": 3,
+      "type": "uint32",
+      "group": "counter",
+      "sim": 0,
+      "note": "32-bit, word order not stated in the manual (big assumed by default)."
+    },
+    {
+      "name": "DI 1 Counter",
+      "address": 40003,
+      "fc": 3,
+      "type": "uint32",
+      "group": "counter",
+      "sim": 0,
+      "note": "32-bit, word order not stated in the manual (big assumed by default)."
+    },
+    {
+      "name": "DI 2 Counter",
+      "address": 40005,
+      "fc": 3,
+      "type": "uint32",
+      "group": "counter",
+      "sim": 0,
+      "note": "32-bit, word order not stated in the manual (big assumed by default)."
+    },
+    {
+      "name": "DI 3 Counter",
+      "address": 40007,
+      "fc": 3,
+      "type": "uint32",
+      "group": "counter",
+      "sim": 0,
+      "note": "32-bit, word order not stated in the manual (big assumed by default)."
+    },
+    {
+      "name": "DI 4 Counter",
+      "address": 40009,
+      "fc": 3,
+      "type": "uint32",
+      "group": "counter",
+      "sim": 0,
+      "note": "32-bit, word order not stated in the manual (big assumed by default)."
+    },
+    {
+      "name": "DI 5 Counter",
+      "address": 40011,
+      "fc": 3,
+      "type": "uint32",
+      "group": "counter",
+      "sim": 0,
+      "note": "32-bit, word order not stated in the manual (big assumed by default)."
+    },
+    {
+      "name": "DI 6 Counter",
+      "address": 40013,
+      "fc": 3,
+      "type": "uint32",
+      "group": "counter",
+      "sim": 0,
+      "note": "32-bit, word order not stated in the manual (big assumed by default)."
+    }
+  ]
+}

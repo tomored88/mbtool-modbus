@@ -1,0 +1,382 @@
+{
+  "name": "Eastron SDM230 (SDM230-Modbus)",
+  "manufacturer": "Eastron",
+  "model": "SDM230",
+  "source": [
+    "https://www.eastroneurope.com/images/uploads/products/protocol/Correct_SDM230_Protocol.pdf",
+    "https://github.com/syssi/esphome-modbus-solax-x1/files/8323539/eastron-sdm230-protocol-v14.pdf"
+  ],
+  "doc_revision": "Eastron SDM230Modbus Smart Meter Modbus Protocol Implementation V1.4 (page headers read 'Eastron SDM230Modbus Protocol V1.3'). Both URLs returned byte-identical files.",
+  "verified": false,
+  "notes": "Built only from the Eastron protocol PDF above (the user manual 'SDM230 Modbus v2' on docs.vekto.nl contains no register map and was not used for registers). Addressing: the document lists register numbers (3xxxx input, 4xxxx holding) and the protocol start address in hex. This preset uses address_base 0 and the PROTOCOL address = input register number minus 30001 (30073 -> 72 = 0x0048) / holding register number minus 40001 (40021 -> 20 = 0x0014); all cross-checked against the hex column. The F9xx / FCxx rows use the doc's hex column: the doc's decimal register numbers for 'Measurement mode' (463776) and 'Running time' (463792) are inconsistent with their hex (F920 / F930) so hex was used; 463761 -> 0xF910 and 464513 -> 0xFC00 match. Data: 32-bit IEEE754 float, 'most significant register first (default)' (a 'Register Order' holding parameter is mentioned but no address is given, so it is not included). Doc limits: max 40 values (80 registers) per request, requests must be even-aligned pairs. NOTE the tool's block merger allows up to 125 registers per read, which exceeds this device limit: read groups separately (e.g. group='measure') or keep the point set small. Defaults per the doc: node address 1, parity/stop code 0 (1 stop, no parity), baud code 0 = 2400 bps (default); doc says selectable baud 1200/2400/4800/9600; baud/parity/ID need a restart. Left out: 'Reset' register 461457 (0xF010, write-only, 0000 = reset max demand, 0003 = reset resettable energy), the BCD-format 'Demand interval/scroll/backlight' register 0xF500, and 'Running time' (0xF930). Not verified against a physical device. max_block=40: the protocol document limits one request to 40 values (80 registers).",
+  "connection": {
+    "type": "rtu",
+    "baud": 2400,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Voltage",
+      "address": 0,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Current",
+      "address": 6,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Active power",
+      "address": 12,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Apparent power",
+      "address": 18,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Reactive power",
+      "address": 24,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VAr",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Power factor",
+      "address": 30,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Phase angle",
+      "address": 36,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "deg",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Frequency",
+      "address": 70,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "Hz",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Import active energy",
+      "address": 72,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export active energy",
+      "address": 74,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Import reactive energy",
+      "address": 76,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export reactive energy",
+      "address": 78,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total system power demand",
+      "address": 84,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum total system power demand",
+      "address": 86,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Current system positive power demand",
+      "address": 88,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum system positive power demand",
+      "address": 90,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Current system reverse power demand",
+      "address": 92,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum system reverse power demand",
+      "address": 94,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Current demand",
+      "address": 258,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum current demand",
+      "address": 264,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Total active energy",
+      "address": 342,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total reactive energy",
+      "address": 344,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Resettable total active energy",
+      "address": 384,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc: 'Current resettable total active energy'."
+    },
+    {
+      "name": "Resettable total reactive energy",
+      "address": 386,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc: 'Current resettable total reactive energy'."
+    },
+    {
+      "name": "Pulse output 1 width",
+      "address": 12,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "ms",
+      "access": "rw",
+      "min": 60,
+      "max": 200,
+      "group": "config",
+      "note": "Doc: relay on period in ms: 60, 100 or 200, default 100. min/max are the extremes; only 60/100/200 are valid. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Network parity/stop",
+      "address": 18,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "1 stop bit, no parity (default)",
+        "1": "1 stop bit, even parity",
+        "2": "1 stop bit, odd parity",
+        "3": "2 stop bits, no parity"
+      },
+      "note": "Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Network node (Modbus address)",
+      "address": 20,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "note": "Doc: 1 to 247, default 1. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Network baud rate",
+      "address": 28,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "0": "2400 (default)",
+        "1": "4800",
+        "2": "9600",
+        "5": "1200"
+      },
+      "note": "Doc lists only codes 0, 1, 2 and 5. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Pulse 1 energy type",
+      "address": 86,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "1": "Import Wh",
+        "2": "Import and export Wh",
+        "4": "Export Wh (default)",
+        "5": "Import VArh",
+        "6": "Import and export VArh",
+        "8": "Export VArh"
+      },
+      "note": "Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Pulse 1 constant",
+      "address": 63760,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "0": "0.001 kWh(kvarh)/imp (default)",
+        "1": "0.01 kWh(kvarh)/imp",
+        "2": "0.1 kWh(kvarh)/imp",
+        "3": "1 kWh(kvarh)/imp"
+      },
+      "note": "Doc register number 463761; 2-byte HEX."
+    },
+    {
+      "name": "Measurement mode",
+      "address": 63776,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "1": "Mode 1 (total = import)",
+        "2": "Mode 2 (total = import + export) (default)",
+        "3": "Mode 3 (total = import - export)"
+      },
+      "note": "Hex address F920 used; doc register number is printed as 463776."
+    },
+    {
+      "name": "Serial number",
+      "address": 64512,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "big",
+      "access": "r",
+      "group": "config",
+      "note": "Doc: unsigned int32, read only (464513). Word order not stated in the doc; big is an assumption."
+    }
+  ],
+  "max_block": 40
+}

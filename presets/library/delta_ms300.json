@@ -1,0 +1,232 @@
+{
+ "name": "Delta MS300 (VFD-MS300) Modbus RTU",
+ "manufacturer": "Delta Electronics",
+ "model": "MS300 series compact drive (Standard Compact Drive MS300)",
+ "verified": false,
+ "source": [
+  "https://studylib.es/doc/9487189/4594799-1-delta-ia-mds-vfd-ms300-um-en-20170306"
+ ],
+ "doc_revision": "Delta Standard Compact Drive MS300 Series User Manual, file 4594799_1_DELTA_IA-MDS_VFD-MS300_UM_EN_20170306 (2017-03-06 per file name); Chapter 12, Group 09 communication parameters and Modbus 'Address list'. Third-party (studylib) copy of Delta's manual.",
+ "notes": "Built from the manual text above; NOT verified on a physical drive. The text was read through a summarising web fetch, so scaling strings such as 'XXX.XX Hz' are as reported there; check them against Delta's current manual. Addressing: the manual quotes hexadecimal data addresses used directly in the Modbus frame (e.g. 2102H in a 03H request to drive 01H), so address_base is 0 and each 'address' is the hex value converted to decimal (2000H=8192, 2100H=8448, 0900H=2304). Parameter Pr.GG-nn is at address GGnnH (manual example: Pr.04-01 = 0401H), so Pr.09-00=0900H=2304 ... Pr.09-04=0904H=2308. Communication defaults per manual: Pr.09-00 address 1, Pr.09-01 9.6 Kbps, Pr.09-04 factory value 1 = ASCII 7N2. This preset's 'connection' assumes RTU 8N1 at 9600, which requires setting Pr.09-04 = 12 (RTU 8N1) first. Function codes per manual: 03H read, 06H write single, 10H write multiple (up to 20 values). SAFETY: the points in group 'control' (2000H drive command: run/stop/direction, 2001H frequency command, 2002H EF/reset/B.B) command a real motor. They are marked rw because the manual lists them as command registers; the manual marks 2000H as write-only, so reading it may return an exception. No min/max for 2001H is given in the part of the manual read (limits depend on drive parameters), so none is enforced here. 2000H bits: b1-0 00 none/01 stop/10 run/11 JOG+RUN; b5-4 00 none/01 FWD/10 REV/11 change direction; b7-6 accel/decel set 1-4; b11-8 0000 master speed, 0001-1111 multi-step 1-15; b12 enable Pr.06-11; b14-13 operation-command source select. 2002H bits: b0 EF on, b1 reset, b2 B.B on. 2101H bits: b1-0 00 stopped/01 decelerating/10 standby/11 operating; b2 JOG; b4-3 direction (00 FWD, 01 REV->FWD, 10 REV, 11 FWD->REV); b8 master freq from comms; b9 from analog; b10 run command from comms; b11 parameters locked; b12 copy-from-keypad enabled. 2100H: high byte = warning code, low byte = error code (code tables are in Chapters 13/14 of the manual, not captured here). Not captured (left out): rows 2108H-2234H other than those listed, error-code tables, and the raw register encoding of Pr.09-01 and Pr.09-03 (shown as raw values). Output current above 655.35 A changes its decimal position per the high byte of 211FH (manual); that is not handled by this preset.",
+ "connection": {
+  "type": "rtu",
+  "baud": 9600,
+  "parity": "N",
+  "stop": 1,
+  "data": 8,
+  "unit": 1,
+  "timeout": 1.0
+ },
+ "address_base": 0,
+ "points": [
+  {
+   "name": "Drive Command (2000H)",
+   "address": 8192,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "note": "Bit-coded command word, manual says write-only. COMMANDS REAL MACHINERY (run/stop/direction)."
+  },
+  {
+   "name": "Frequency Command (2001H)",
+   "address": 8193,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.01,
+   "unit": "Hz",
+   "access": "rw",
+   "group": "control",
+   "note": "XXX.XX Hz. Commands real machinery."
+  },
+  {
+   "name": "Control Bits (2002H)",
+   "address": 8194,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "note": "b0 EF on, b1 reset, b2 B.B on. Commands real machinery."
+  },
+  {
+   "name": "Warning/Error Code (2100H)",
+   "address": 8448,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "High byte warning code, low byte error code."
+  },
+  {
+   "name": "Operation Status (2101H)",
+   "address": 8449,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 3,
+   "note": "Bit-coded, see preset notes."
+  },
+  {
+   "name": "Frequency Command Readback (2102H)",
+   "address": 8450,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.01,
+   "unit": "Hz",
+   "access": "r",
+   "group": "status",
+   "sim": 50.0
+  },
+  {
+   "name": "Output Frequency",
+   "address": 8451,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.01,
+   "unit": "Hz",
+   "access": "r",
+   "group": "status",
+   "sim": 49.98
+  },
+  {
+   "name": "Output Current",
+   "address": 8452,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.01,
+   "unit": "A",
+   "access": "r",
+   "group": "status",
+   "sim": 3.25,
+   "note": "XX.XX A; decimal position changes above 655.35 A (see notes)."
+  },
+  {
+   "name": "DC-BUS Voltage",
+   "address": 8453,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.1,
+   "unit": "V",
+   "access": "r",
+   "group": "status",
+   "sim": 311.0
+  },
+  {
+   "name": "Output Voltage",
+   "address": 8454,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.1,
+   "unit": "V",
+   "access": "r",
+   "group": "status",
+   "sim": 228.5
+  },
+  {
+   "name": "Current Multi-step Number",
+   "address": 8455,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "Output Torque",
+   "address": 8459,
+   "fc": 3,
+   "type": "uint16",
+   "scale": 0.1,
+   "unit": "%",
+   "access": "r",
+   "group": "status",
+   "note": "XXX.X %. Signedness not stated in the part of the manual read; treated as unsigned."
+  },
+  {
+   "name": "Actual Motor Speed",
+   "address": 8460,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "rpm",
+   "access": "r",
+   "group": "status"
+  },
+  {
+   "name": "Pr.09-00 Communication Address",
+   "address": 2304,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "min": 1,
+   "max": 254,
+   "group": "config",
+   "sim": 1,
+   "note": "Range 1-254, factory 1."
+  },
+  {
+   "name": "Pr.09-01 COM1 Transmission Speed (raw)",
+   "address": 2305,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "sim": 96,
+   "note": "Manual: 4.8/9.6/19.2/38.4/57.6/115.2 Kbps, factory 9.6, other values fall back to 9.6. Raw register encoding is not stated in the text read, so the raw value is shown unscaled."
+  },
+  {
+   "name": "Pr.09-02 Transmission Fault Treatment",
+   "address": 2306,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "enum": {
+    "0": "Warn and continue operation",
+    "1": "Warn and ramp to stop",
+    "2": "Warn and coast to stop",
+    "3": "No warning and continue operation"
+   },
+   "sim": 3
+  },
+  {
+   "name": "Pr.09-03 Time-out Detection (raw)",
+   "address": 2307,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "sim": 0,
+   "note": "Range 0.0-100.0 s, factory 0.0 (disabled). Raw register encoding not stated in text read; shown unscaled."
+  },
+  {
+   "name": "Pr.09-04 COM1 Communication Protocol",
+   "address": 2308,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "config",
+   "enum": {
+    "1": "ASCII 7N2",
+    "2": "ASCII 7E1",
+    "3": "ASCII 7O1",
+    "4": "ASCII 7E2",
+    "5": "ASCII 7O2",
+    "6": "ASCII 8N1",
+    "7": "ASCII 8N2",
+    "8": "ASCII 8E1",
+    "9": "ASCII 8O1",
+    "10": "ASCII 8E2",
+    "11": "ASCII 8O2",
+    "12": "RTU 8N1",
+    "13": "RTU 8N2",
+    "14": "RTU 8E1",
+    "15": "RTU 8O1",
+    "16": "RTU 8E2",
+    "17": "RTU 8O2"
+   },
+   "sim": 12,
+   "note": "Factory setting 1 (ASCII 7N2). Changes take effect per the manual; changing it can cut the link."
+  }
+ ]
+}

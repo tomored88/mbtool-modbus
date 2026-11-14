@@ -1,0 +1,123 @@
+{
+  "name": "Peacefair PZEM-004T (Modbus-RTU)",
+  "manufacturer": "Peacefair (PZEM)",
+  "model": "PZEM-004T v3.0",
+  "source": [
+    "https://narodmon.com/img/sens/PZEM-004Tv3.pdf"
+  ],
+  "doc_revision": "PDF titled 'PZEM-004T-Datasheet-user-manual' (author Pzem, 7 pages, created 2019-04): 'PZEM-004T AC communication module', PZEM-004T-10A / PZEM-004T-100A. The document does not say 'v3.0' in the text I could read.",
+  "verified": false,
+  "notes": "Built only from the datasheet above. Addressing: the doc gives protocol register addresses (0x0000-0x0009 for FC04 measurements, 0x0001-0x0002 for FC03/FC06 parameters), so address_base 0 and no conversion. Serial: 9600 baud, 8 data bits, 1 stop bit, no parity (doc section 2.1). Slave address range 0x01-0xF7 (0x00 broadcast, 0xF8 general address); default slave address is not stated. 32-bit values (current, power, energy) are split into LOW 16 bits first, HIGH 16 bits second (doc table 'low 16 bits' at the lower address; worked example 0x000003E8 = 1.000 A is consistent), hence word_order 'little'. Doc example reads all 10 registers (0x0000-0x0009) in one FC04 request. Writable via plain FC06 per the doc: 0x0001 power alarm threshold (1 LSB = 1 W) and 0x0002 Modbus-RTU address (0x0001-0x00F7); I marked both rw although the task brief suggested address/reset might not be plain writes - in THIS datasheet the address IS a plain FC06 write to holding register 0x0002 (a changed address needs the master to switch to the new address). The reset-energy command (function code 0x42, frame = address + 0x42 + CRC) and the calibration command (0x41, factory use only, address 0xF8, password 0x3721) are NOT register writes and are NOT included. The datasheet is internally inconsistent about the interface (section 1.8/2.1 say RS485, section 5.1 describes a passive TTL interface needing 5V/RX/TX/GND). Some forum reports say multi-register reads are not supported on certain units; the datasheet shows one. Not verified against a physical device.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Voltage",
+      "address": 0,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc: 1 LSB = 0.1 V (range 80-260 V)."
+    },
+    {
+      "name": "Current",
+      "address": 1,
+      "fc": 4,
+      "type": "uint32",
+      "word_order": "little",
+      "scale": 0.001,
+      "unit": "A",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc: low 16 bits at 0x0001, high 16 bits at 0x0002; 1 LSB = 0.001 A."
+    },
+    {
+      "name": "Active power",
+      "address": 3,
+      "fc": 4,
+      "type": "uint32",
+      "word_order": "little",
+      "scale": 0.1,
+      "unit": "W",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc: low 16 bits at 0x0003, high at 0x0004; 1 LSB = 0.1 W."
+    },
+    {
+      "name": "Active energy",
+      "address": 5,
+      "fc": 4,
+      "type": "uint32",
+      "word_order": "little",
+      "unit": "Wh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc: low 16 bits at 0x0005, high at 0x0006; 1 LSB = 1 Wh (range 0-9999.99 kWh). Reset only via function code 0x42 (not a register write; not included)."
+    },
+    {
+      "name": "Frequency",
+      "address": 7,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.1,
+      "unit": "Hz",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc: 1 LSB = 0.1 Hz."
+    },
+    {
+      "name": "Power factor",
+      "address": 8,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.01,
+      "access": "r",
+      "group": "measure",
+      "note": "Doc: 1 LSB = 0.01."
+    },
+    {
+      "name": "Alarm status",
+      "address": 9,
+      "fc": 4,
+      "type": "uint16",
+      "access": "r",
+      "group": "status",
+      "enum": {
+        "65535": "Alarm",
+        "0": "No alarm"
+      },
+      "note": "Doc: 0xFFFF is alarm, 0x0000 is not alarm."
+    },
+    {
+      "name": "Power alarm threshold",
+      "address": 1,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "W",
+      "access": "rw",
+      "group": "config",
+      "note": "Doc section 2.4: holding register 0x0001, 1 LSB = 1 W, read with FC03, written with FC06. No limits stated."
+    },
+    {
+      "name": "Modbus address",
+      "address": 2,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "note": "Doc: holding register 0x0002, range 0x0001-0x00F7, written with FC06 (plain register write in this datasheet). Takes effect for subsequent requests."
+    }
+  ]
+}

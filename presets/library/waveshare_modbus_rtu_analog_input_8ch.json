@@ -1,0 +1,377 @@
+{
+  "name": "Waveshare Modbus RTU Analog Input 8CH (4-20 mA / voltage to RS485)",
+  "manufacturer": "Waveshare",
+  "model": "Modbus RTU Analog Input 8CH",
+  "source": [
+    "https://www.waveshare.com/wiki/Modbus_RTU_Analog_Input_8CH"
+  ],
+  "doc_revision": "Waveshare Wiki page 'Modbus RTU Analog Input 8CH' as fetched 2026-11; no document number or revision date",
+  "verified": false,
+  "notes": "Read via the Waveshare wiki page text (no PDF). Register table addresses are hex protocol addresses starting at 0x0000: channel data = '3x0000..3x0007' (input registers, FC04), range mode = '4x1000..4x1007' (FC03/06/10), UART = 0x2000 (FC03/06), device address = 0x4000 (FC03/06), software version = 0x8000 (FC03). address_base=0, addresses here are the hex values converted to decimal (0x1000=4096, 0x2000=8192, 0x4000=16384, 0x8000=32768); the wiki does not say whether 1-based tools should add one. Channel values are unsigned 16 bit and their unit depends on each channel's range mode: version (A): mode 0 = 0-5 V in mV, 1 = 1-5 V in mV, 2 = 0-20 mA in uA, 3 = 4-20 mA in uA, 4 = raw code 0..4096; default mode 2 (0-20 mA), jumpers connected. Because the unit depends on the mode, the preset exposes the raw value (unit left blank) plus a second 'CHn Current' set scaled to mA for use with 4-20 mA transmitters (valid only in modes 2/3). For raw mode 4 the wiki gives a conversion formula (voltage = code x 3300 / 4095 / op-amp ratio, current = voltage / sampling resistor; A: op-amp ratio 32.4/49.9, 249 ohm) that is not modelled. The wiki does not state factory defaults for baud rate, parity or address; its examples use 9600 baud, 8 data bits, no parity, address 01, so the connection block is an example, not a documented default. Not modelled: nothing else is documented in the register table (no write-only commands).",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "CH1 Input Raw",
+      "address": 0,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 12000
+    },
+    {
+      "name": "CH2 Input Raw",
+      "address": 1,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 4000
+    },
+    {
+      "name": "CH3 Input Raw",
+      "address": 2,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 4000
+    },
+    {
+      "name": "CH4 Input Raw",
+      "address": 3,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 4000
+    },
+    {
+      "name": "CH5 Input Raw",
+      "address": 4,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 4000
+    },
+    {
+      "name": "CH6 Input Raw",
+      "address": 5,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 4000
+    },
+    {
+      "name": "CH7 Input Raw",
+      "address": 6,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 4000
+    },
+    {
+      "name": "CH8 Input Raw",
+      "address": 7,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "note": "Unsigned 16 bit. Unit depends on the channel range mode (register 0x1000+): mV in voltage modes, uA in current modes, raw ADC code in mode 4.",
+      "sim": 4000
+    },
+    {
+      "name": "CH1 Current",
+      "address": 0,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH1 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 1 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 12.0
+    },
+    {
+      "name": "CH2 Current",
+      "address": 1,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH2 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 2 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 4.0
+    },
+    {
+      "name": "CH3 Current",
+      "address": 2,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH3 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 3 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 4.0
+    },
+    {
+      "name": "CH4 Current",
+      "address": 3,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH4 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 4 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 4.0
+    },
+    {
+      "name": "CH5 Current",
+      "address": 4,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH5 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 5 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 4.0
+    },
+    {
+      "name": "CH6 Current",
+      "address": 5,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH6 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 6 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 4.0
+    },
+    {
+      "name": "CH7 Current",
+      "address": 6,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH7 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 7 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 4.0
+    },
+    {
+      "name": "CH8 Current",
+      "address": 7,
+      "fc": 4,
+      "type": "uint16",
+      "scale": 0.001,
+      "unit": "mA",
+      "group": "measure_mA",
+      "note": "Same register as 'CH8 Input Raw' scaled by 0.001 (uA -> mA). ONLY valid when channel 8 range mode is 2 (0-20 mA) or 3 (4-20 mA).",
+      "sim": 4.0
+    },
+    {
+      "name": "CH1 Range Mode",
+      "address": 4096,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 1. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH1 Input Raw'."
+    },
+    {
+      "name": "CH2 Range Mode",
+      "address": 4097,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 2. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH2 Input Raw'."
+    },
+    {
+      "name": "CH3 Range Mode",
+      "address": 4098,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 3. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH3 Input Raw'."
+    },
+    {
+      "name": "CH4 Range Mode",
+      "address": 4099,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 4. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH4 Input Raw'."
+    },
+    {
+      "name": "CH5 Range Mode",
+      "address": 4100,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 5. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH5 Input Raw'."
+    },
+    {
+      "name": "CH6 Range Mode",
+      "address": 4101,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 6. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH6 Input Raw'."
+    },
+    {
+      "name": "CH7 Range Mode",
+      "address": 4102,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 7. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH7 Input Raw'."
+    },
+    {
+      "name": "CH8 Range Mode",
+      "address": 4103,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "enum": {
+        "0": "0-5 V (output 0..5000 mV)",
+        "1": "1-5 V (output 1000..5000 mV)",
+        "2": "0-20 mA (output 0..20000 uA)",
+        "3": "4-20 mA (output 4000..20000 uA)",
+        "4": "Raw ADC code (output 0..4096)"
+      },
+      "group": "config",
+      "sim": 3,
+      "note": "Data type / range mode of channel 8. The jumper for the channel must match (connected = current, disconnected = voltage). Changing it changes the meaning of 'CH8 Input Raw'."
+    },
+    {
+      "name": "UART Parameters",
+      "address": 8192,
+      "fc": 3,
+      "type": "uint16",
+      "group": "config",
+      "access": "r",
+      "enum": {
+        "0": "4800 baud, no parity",
+        "1": "9600 baud, no parity",
+        "2": "19200 baud, no parity",
+        "3": "38400 baud, no parity",
+        "4": "57600 baud, no parity",
+        "5": "115200 baud, no parity",
+        "6": "128000 baud, no parity",
+        "7": "256000 baud, no parity"
+      },
+      "sim": 1,
+      "note": "High byte = parity (0x00 none, 0x01/0x02 even/odd), low byte = baud code 0-7. The wiki lists 0x01/0x02 as even/odd in one place and odd/even in another, so parity is ambiguous; register is documented as R/W (FC03/06) but left read-only here for that reason. Enum only covers the no-parity values."
+    },
+    {
+      "name": "Device Address",
+      "address": 16384,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 255,
+      "group": "config",
+      "sim": 1,
+      "note": "Modbus slave address, 0x0001-0x00FF. Writing it moves the device to a new address."
+    },
+    {
+      "name": "Software Version",
+      "address": 32768,
+      "fc": 3,
+      "type": "uint16",
+      "scale": 0.01,
+      "group": "info",
+      "sim": 1.0,
+      "note": "Raw decimal / 100 (0x0064 = V1.00)."
+    }
+  ]
+}

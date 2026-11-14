@@ -1,0 +1,443 @@
+{
+  "name": "VEGA VEGAPULS C 21 radar level sensor (Modbus RTU)",
+  "manufacturer": "VEGA",
+  "model": "VEGAPULS C 21 (Modbus and Levelmaster protocol version)",
+  "source": [
+    "https://instrumart.com/assets/VEGAPULS-C-21-Modbus-manual.pdf"
+  ],
+  "doc_revision": "VEGAPULS C 21 Modbus and Levelmaster protocol Operating Instructions, Document ID 58343-EN-241115 (15 Nov 2024)",
+  "verified": false,
+  "notes": "Register list is chapter 14.3-14.7 of the operating instructions. Addressing: the 'Register Number' column is used directly as the address in the frame (host-configuration table: 'Fisher ROC 809 - register address for 1300 is address 1300', input-register base 0), so address_base=0. Input registers (ro) via FC04, holding registers (r/w) via FC03/06/16. Supported FCs: 03, 04, 06, 08, 16, 17, 43/14. Float order: the manual provides the same PV/SV/TV/QV four times in fixed byte orders: 1400.. and 100-block in CDAB, 2000.. in ABCD (big endian), 2100.. DCBA, 2200.. BACD, and 1300.. in the order set by register 3000. This preset uses the fixed ABCD block (2000..) = word_order big. The additional measurement block (2303-2316) states no byte order; it is assumed to follow register 3000 (default ABCD) - the manual is silent. 'enum8' / 'uint8' registers are read as one 16 bit register (the manual does not describe the register layout). The unit of PV..QV depends on the configured unit codes (104,108,112,116), exposed as enum points - nothing is hard-coded. Sensor adjustment (3401/3403) are calibration values (unit not stated) and are in group 'config'. Default communication from the manual: address 246, baud 9600, parity none, one stop bit, delay 50 ms; the manual says the device supports Modbus RTU, Modbus ASCII and Levelmaster but does not say which mode is the default - RTU is assumed in the connection block (8N1). Levelmaster ASCII commands and the Levelmaster address (register 250) are not modelled. Other VEGA sensors (VEGAPULS 61/62, VEGAFLEX 81) have their own Modbus manuals which I did not read; do not assume the same registers.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 246,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Status",
+      "address": 2000,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "enum8 per manual; read as one register (size assumed). Bit0 invalid PV, bit1 invalid SV, bit2 invalid TV, bit3 invalid QV."
+    },
+    {
+      "name": "PV",
+      "address": 2002,
+      "fc": 4,
+      "type": "float32",
+      "group": "measure",
+      "sim": 1.234,
+      "note": "Primary variable in byte order ABCD (big endian), fixed order block. Unit: see 'PV Unit' (register 104). Which quantity PV is (distance, level, ...) is device configuration."
+    },
+    {
+      "name": "SV",
+      "address": 2004,
+      "fc": 4,
+      "type": "float32",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "Secondary variable, ABCD. Unit: see 'SV Unit'."
+    },
+    {
+      "name": "TV",
+      "address": 2006,
+      "fc": 4,
+      "type": "float32",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "Third variable, ABCD. Unit: see 'TV Unit'."
+    },
+    {
+      "name": "QV",
+      "address": 2008,
+      "fc": 4,
+      "type": "float32",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "Quaternary variable, ABCD. Unit: see 'QV Unit'."
+    },
+    {
+      "name": "PV Unit",
+      "address": 104,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "enum": {
+        "32": "degC",
+        "33": "degF",
+        "39": "Percent",
+        "40": "US gallons",
+        "41": "Liters",
+        "42": "Imperial gallons",
+        "43": "Cubic meters",
+        "44": "Feet",
+        "45": "Meters",
+        "46": "Barrels",
+        "47": "Inches",
+        "48": "Centimeters",
+        "49": "Millimeters",
+        "111": "Cubic yards",
+        "112": "Cubic feet",
+        "113": "Cubic inches"
+      },
+      "sim": 45,
+      "note": "enum16 unit code of PV."
+    },
+    {
+      "name": "SV Unit",
+      "address": 108,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "enum": {
+        "32": "degC",
+        "33": "degF",
+        "39": "Percent",
+        "40": "US gallons",
+        "41": "Liters",
+        "42": "Imperial gallons",
+        "43": "Cubic meters",
+        "44": "Feet",
+        "45": "Meters",
+        "46": "Barrels",
+        "47": "Inches",
+        "48": "Centimeters",
+        "49": "Millimeters",
+        "111": "Cubic yards",
+        "112": "Cubic feet",
+        "113": "Cubic inches"
+      },
+      "sim": 45,
+      "note": "Unit code of SV (enum list as for PV Unit; the manual only says 'Unit Code')."
+    },
+    {
+      "name": "TV Unit",
+      "address": 112,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "enum": {
+        "32": "degC",
+        "33": "degF",
+        "39": "Percent",
+        "40": "US gallons",
+        "41": "Liters",
+        "42": "Imperial gallons",
+        "43": "Cubic meters",
+        "44": "Feet",
+        "45": "Meters",
+        "46": "Barrels",
+        "47": "Inches",
+        "48": "Centimeters",
+        "49": "Millimeters",
+        "111": "Cubic yards",
+        "112": "Cubic feet",
+        "113": "Cubic inches"
+      },
+      "sim": 32,
+      "note": "Unit code of TV."
+    },
+    {
+      "name": "QV Unit",
+      "address": 116,
+      "fc": 4,
+      "type": "uint16",
+      "group": "measure",
+      "enum": {
+        "32": "degC",
+        "33": "degF",
+        "39": "Percent",
+        "40": "US gallons",
+        "41": "Liters",
+        "42": "Imperial gallons",
+        "43": "Cubic meters",
+        "44": "Feet",
+        "45": "Meters",
+        "46": "Barrels",
+        "47": "Inches",
+        "48": "Centimeters",
+        "49": "Millimeters",
+        "111": "Cubic yards",
+        "112": "Cubic feet",
+        "113": "Cubic inches"
+      },
+      "sim": 45,
+      "note": "Unit code of QV."
+    },
+    {
+      "name": "Measured Distance",
+      "address": 2303,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m",
+      "group": "measure",
+      "sim": 1.5,
+      "note": "Distance sensor reference plane to liquid surface in m. Word order of this block is not stated; assumed to follow 'Byte Order' register 3000 (default ABCD)."
+    },
+    {
+      "name": "Absolute Echo Amplitude",
+      "address": 2305,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "diagnostic",
+      "sim": 60.0,
+      "note": "Word order as 'Measured Distance'."
+    },
+    {
+      "name": "Signal Quality",
+      "address": 2314,
+      "fc": 4,
+      "type": "float32",
+      "unit": "dB",
+      "group": "diagnostic",
+      "sim": 30.0,
+      "note": "Word order as 'Measured Distance'."
+    },
+    {
+      "name": "Filling Height",
+      "address": 2316,
+      "fc": 4,
+      "type": "float32",
+      "unit": "m",
+      "group": "measure",
+      "sim": 3.2,
+      "note": "Word order as 'Measured Distance'."
+    },
+    {
+      "name": "Current Diagnostic Code",
+      "address": 2300,
+      "fc": 4,
+      "type": "uint32",
+      "group": "status",
+      "sim": 0,
+      "note": "NAMUR NE 107 diagnostic code (32 bit)."
+    },
+    {
+      "name": "Device Status",
+      "address": 2307,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "enum": {
+        "0": "OK",
+        "1": "Failure",
+        "2": "Check",
+        "4": "Maintenance",
+        "8": "Out of spec"
+      },
+      "sim": 0,
+      "note": "uint8 per manual; read as one register (size assumed)."
+    },
+    {
+      "name": "Modbus Address",
+      "address": 200,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 255,
+      "group": "config",
+      "sim": 246,
+      "note": "Default 246. Valid Modbus slave addresses are 1..247; the manual lists 1...255. Writing it moves the device."
+    },
+    {
+      "name": "Baud Rate",
+      "address": 201,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "sim": 9600,
+      "note": "enum16, listed values 1200, 2400, 4800, 9600 (default), 19200, 38400, 57600. The manual does not say whether the register holds the baud number or a code, so it is read-only here."
+    },
+    {
+      "name": "Parity",
+      "address": 202,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "0": "None",
+        "1": "Odd",
+        "2": "Even"
+      },
+      "sim": 0,
+      "note": "Default 0 (None)."
+    },
+    {
+      "name": "Stopbits",
+      "address": 203,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "1": "One",
+        "2": "Two"
+      },
+      "sim": 1
+    },
+    {
+      "name": "Delay Time",
+      "address": 206,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "ms",
+      "access": "rw",
+      "min": 10,
+      "max": 250,
+      "group": "config",
+      "sim": 50,
+      "note": "Default 50 ms."
+    },
+    {
+      "name": "Byte Order",
+      "address": 3000,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "ABCD",
+        "1": "CDAB",
+        "2": "DCBA",
+        "3": "BADC"
+      },
+      "sim": 0,
+      "note": "Default ABCD. Applies to the float blocks that follow 'the byte order of register 3000' (1300.., and presumably 2303..). This preset reads the fixed ABCD block 2000.. and assumes the default for the rest."
+    },
+    {
+      "name": "Distance Unit",
+      "address": 3200,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 44,
+      "max": 49,
+      "group": "config",
+      "enum": {
+        "44": "ft",
+        "45": "m",
+        "47": "in",
+        "49": "mm"
+      },
+      "sim": 45,
+      "note": "Default m."
+    },
+    {
+      "name": "Temperature Unit",
+      "address": 3201,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 32,
+      "max": 35,
+      "group": "config",
+      "enum": {
+        "32": "degC",
+        "33": "degF",
+        "35": "K"
+      },
+      "sim": 32,
+      "note": "Default degC."
+    },
+    {
+      "name": "Min Adjustment",
+      "address": 3401,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "Sensor min adjustment (empty distance), documented range 0 ... measurement range, default 0. Unit not stated in the table. THIS IS A CALIBRATION VALUE - changes the level reading/scaling. Word order assumed ABCD."
+    },
+    {
+      "name": "Max Adjustment",
+      "address": 3403,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 5.0,
+      "note": "Sensor max adjustment (full distance), range 0 ... measurement range, default = measurement range. Unit not stated. CALIBRATION VALUE. Word order assumed ABCD."
+    },
+    {
+      "name": "Medium Type",
+      "address": 3600,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "Liquids",
+        "1": "Solids"
+      },
+      "sim": 0
+    },
+    {
+      "name": "Application Liquid",
+      "address": 3601,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 14,
+      "group": "config",
+      "sim": 0,
+      "enum": {
+        "0": "Storage tank",
+        "1": "Storage tank (product agitation)",
+        "2": "Cargo tank",
+        "3": "Reactor tank",
+        "4": "Dosing tank",
+        "5": "Stilling pipe",
+        "6": "Bypass",
+        "7": "Outside of plastic tank",
+        "8": "Outside of mobile plastic tank",
+        "9": "Level of open water",
+        "10": "Open flume",
+        "11": "Water weir",
+        "12": "Demonstration",
+        "13": "Pump station",
+        "14": "Collection tank"
+      }
+    },
+    {
+      "name": "Application Solid",
+      "address": 3602,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 5,
+      "group": "config",
+      "sim": 0,
+      "enum": {
+        "0": "Silo",
+        "1": "Bunker big",
+        "2": "Bunker fast filling",
+        "3": "Profile registration heap",
+        "4": "Breaker mill",
+        "5": "Demonstration"
+      }
+    }
+  ]
+}

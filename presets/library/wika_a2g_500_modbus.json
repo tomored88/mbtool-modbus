@@ -1,0 +1,291 @@
+{
+  "name": "WIKA A2G-500 differential pressure sensor (Modbus RTU RS-485)",
+  "manufacturer": "WIKA",
+  "model": "A2G-500 (A2G-520 / A2G-540 share the register document)",
+  "source": [
+    "https://www.wika.com/media/Operating-instructions/Special-documentations/sd_a2g_5x0_modbus_en_co.pdf"
+  ],
+  "doc_revision": "WIKA special documentation 'Modbus register, models A2G-500, A2G-520 and A2G-540', item 40455191.01, 04/2025 EN",
+  "verified": false,
+  "notes": "Each table in the document gives 'Coil / Register reference' (e.g. 30022) and 'Bus addr. (decimal)' (0021): the bus address is the protocol (0-based) address, so address_base=0 and 'address' is the Bus address column (register number - 1). Input registers are FC04, holding registers FC03/06/16, coils FC01/05/15. Defaults/limits stated: RTU, 8 data bits, parity None/Even(default)/Odd, baud 9600/19200(default)/38400, Modbus address 1...247 (default address not stated; unit=1 is a placeholder), so the connection block is Even parity, 1 stop, 19200. The configuration registers for baud/parity/address are not in this register document and are not modelled. Only the A2G-500 differential-pressure part was modelled: the A2G-520 flow registers (30040-30045, 40020/40021) and the A2G-540 controller registers (40040-40074, coils 20/21) are NOT included; the Voltage/Temperature input registers exist only with options. Pressure is signed 16 bit in Pa (resolution 1 Pa), plus a 0.1 Pa 'high resolution' register and an inWC set of registers; the values are limited by the interface as stated in the document. Left out because they act on the measurement: coil 00002 'Auto zero trigger' (write-only, starts a zero adjustment). 'Auto Zero Enable' and 'Auto Zero Interval' are plain writes that change when the sensor zeroes. The LoRa registers and the analogue-output registers (30080-30083) and binary-input discrete inputs were not included.",
+  "connection": {
+    "type": "rtu",
+    "baud": 19200,
+    "parity": "E",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Firmware Version",
+      "address": 0,
+      "fc": 4,
+      "type": "uint16",
+      "group": "info",
+      "sim": 4097,
+      "note": "Bitmask: bits 12-15 major, 8-11 minor, 0-7 patch."
+    },
+    {
+      "name": "Hardware Version",
+      "address": 1,
+      "fc": 4,
+      "type": "uint16",
+      "group": "info",
+      "sim": 1,
+      "note": "Range 0..15."
+    },
+    {
+      "name": "Instrument Type",
+      "address": 2,
+      "fc": 4,
+      "type": "uint16",
+      "group": "info",
+      "enum": {
+        "1": "A2G-500 differential pressure",
+        "2": "A2G-520 flow measurement",
+        "3": "A2G-540 pressure / flow controller"
+      },
+      "sim": 1
+    },
+    {
+      "name": "Operating Range",
+      "address": 3,
+      "fc": 4,
+      "type": "uint16",
+      "group": "info",
+      "enum": {
+        "0": "Single-range",
+        "1": "-250 ... +250 Pa",
+        "2": "-2500 ... +2500 Pa",
+        "3": "-7000 ... +7000 Pa",
+        "4": "-12000 ... +12000 Pa"
+      },
+      "sim": 2
+    },
+    {
+      "name": "Date of Manufacture",
+      "address": 4,
+      "fc": 4,
+      "type": "uint16",
+      "group": "info",
+      "sim": 0,
+      "note": "Bitmask: bits 0-6 year since 2000, bits 7-10 month, bits 11-15 day (the table lists 'yyyy / dd / mm' assignments inconsistently; check the manual)."
+    },
+    {
+      "name": "Hardware Options",
+      "address": 5,
+      "fc": 4,
+      "type": "uint16",
+      "group": "info",
+      "sim": 0,
+      "note": "Bit mask: bit1 voltage input 1, bit2 voltage input 2, bit3 temp input 3, bit4 temp input 4, bit5 analogue out 1, bit6 analogue out 2, bit7 relay 1, bit8 relay 2, bit9 auto zero, bit12 LoRa."
+    },
+    {
+      "name": "Measuring Range Min",
+      "address": 19,
+      "fc": 4,
+      "type": "int16",
+      "unit": "Pa",
+      "group": "measure",
+      "sim": -2500
+    },
+    {
+      "name": "Measuring Range Max",
+      "address": 20,
+      "fc": 4,
+      "type": "int16",
+      "unit": "Pa",
+      "group": "measure",
+      "sim": 2500
+    },
+    {
+      "name": "Pressure",
+      "address": 21,
+      "fc": 4,
+      "type": "int16",
+      "unit": "Pa",
+      "group": "measure",
+      "sim": 125,
+      "note": "Signed 16 bit Pa; limited to -12600..+12600 by the instrument."
+    },
+    {
+      "name": "Pressure High Resolution",
+      "address": 22,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "Pa",
+      "group": "measure",
+      "sim": -123.4,
+      "note": "Raw -9999..9999 = -999.9..+999.9 Pa (value limited for the Modbus interface)."
+    },
+    {
+      "name": "Measuring Range Min (inWC)",
+      "address": 23,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.01,
+      "unit": "inWC",
+      "group": "measure_inwc",
+      "sim": -10.0
+    },
+    {
+      "name": "Measuring Range Max (inWC)",
+      "address": 24,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.01,
+      "unit": "inWC",
+      "group": "measure_inwc",
+      "sim": 10.0
+    },
+    {
+      "name": "Pressure (inWC)",
+      "address": 25,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.01,
+      "unit": "inWC",
+      "group": "measure_inwc",
+      "sim": 0.5,
+      "note": "Raw -5058..+5058 = -50.58..+50.58 inWC. (The table labels the min/max rows of this block '[Pa]' but the unit is inWC.)"
+    },
+    {
+      "name": "Technical Alarm",
+      "address": 99,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bitmask. Per the table: bit0 pressure overload, bit1 analogue output 1 overload, bit2 analogue output 2 overload, bit3 Modbus error, bit4/5 voltage input 1/2 overload, bit6/7 temperature input 3/4 overload."
+    },
+    {
+      "name": "Instrument Alarm",
+      "address": 100,
+      "fc": 4,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Bitmask: bit n = error code n+1 (16 bits)."
+    },
+    {
+      "name": "Analogue Input 1 Voltage",
+      "address": 59,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "V",
+      "group": "options",
+      "sim": 5.0,
+      "note": "Only readable if the voltage input option is enabled. Range -0.5..10.5 V."
+    },
+    {
+      "name": "Analogue Input 2 Voltage",
+      "address": 60,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "V",
+      "group": "options",
+      "sim": 5.0,
+      "note": "Only readable if the option is enabled."
+    },
+    {
+      "name": "Analogue Input 3 Temperature",
+      "address": 69,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "degC",
+      "group": "options",
+      "sim": 21.5,
+      "note": "Only readable if the input is set to temperature measurement."
+    },
+    {
+      "name": "Analogue Input 4 Temperature",
+      "address": 70,
+      "fc": 4,
+      "type": "int16",
+      "scale": 0.1,
+      "unit": "degC",
+      "group": "options",
+      "sim": 21.5,
+      "note": "Only readable if the input is set to temperature measurement."
+    },
+    {
+      "name": "Response Time",
+      "address": 0,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 0,
+      "max": 21,
+      "group": "config",
+      "enum": {
+        "0": "0.5 s",
+        "1": "0.8 s",
+        "2": "1 s",
+        "3": "2 s",
+        "21": "20 s"
+      },
+      "sim": 2,
+      "note": "Enum 0..21: 0 = 0.5 s, 1 = 0.8 s, 2 = 1 s, 3 = 2 s ... 21 = 20 s; the intermediate steps are elided ('...') in the document so only the printed ones are in the enum."
+    },
+    {
+      "name": "Auto Zero Interval",
+      "address": 1,
+      "fc": 3,
+      "type": "uint16",
+      "unit": "min",
+      "access": "rw",
+      "min": 1,
+      "max": 999,
+      "group": "config",
+      "sim": 60,
+      "note": "Only readable/writable if the auto-zero option is enabled. Affects when the sensor re-zeros."
+    },
+    {
+      "name": "Auto Zero Enable",
+      "address": 0,
+      "fc": 1,
+      "type": "bool",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "0": "OFF",
+        "1": "ON"
+      },
+      "sim": 0,
+      "note": "Coil 00001; needs the auto-zero option. Enables periodic automatic zeroing of the pressure reading."
+    },
+    {
+      "name": "Relay 1 Status",
+      "address": 9,
+      "fc": 1,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "Open",
+        "1": "Closed"
+      },
+      "sim": 0,
+      "note": "Coil 00010, read only (FC01), needs the relay option."
+    },
+    {
+      "name": "Relay 2 Status",
+      "address": 10,
+      "fc": 1,
+      "type": "bool",
+      "group": "status",
+      "enum": {
+        "0": "Open",
+        "1": "Closed"
+      },
+      "sim": 0,
+      "note": "Coil 00011, read only (FC01), needs the relay option."
+    }
+  ]
+}

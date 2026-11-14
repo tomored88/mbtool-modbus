@@ -1,0 +1,63 @@
+{
+ "name": "Siemens SINAMICS V20 Modbus RTU (minimal)",
+ "manufacturer": "Siemens",
+ "model": "SINAMICS V20",
+ "verified": false,
+ "source": [
+  "https://cache.industry.siemens.com/dl/files/055/109806055/att_1096599/v2/109806055_LOGO_CIM_ModbusRTU_SinamicsV20_DOC_en.pdf",
+  "https://cache.industry.siemens.com/dl/files/870/63696870/att_11054/v1/63696870_v20_at_s7-1200_mb_v1d2_en.pdf"
+ ],
+ "doc_revision": "Siemens application documents: 'LOGO! CIM - Modbus RTU communication with SINAMICS V20', Article ID 109806055 V1.0 02/2022; and 'Speed Control of a V20 with S7-1200 via MODBUS RTU', Entry-ID 63696870 V1.2 11/2014. The SINAMICS V20 Operating Instructions (chapter 'MODBUS communication', mapping table 6.2) were NOT found/read.",
+ "notes": "MINIMAL preset: only the four registers that the two Siemens application notes above name explicitly. The full V20 mapping table is in the Operating Instructions, which could not be retrieved, so nothing was filled from memory. NOT verified on a physical drive. ADDRESSING IS NOT FULLY RESOLVED: the LOGO! CIM note lists the registers as 40024 (output frequency, read-only), 40100 (control word STW, read/write), 40101 (setpoint HSW, read/write), 40110 (status word ZSW, read-only) and says the Modbus start address is the register address minus 40000 (it also calls them holding registers 24/100/101/110). This preset follows that statement literally: address_base 0 and address = register - 40000 (24, 100, 101, 110). Third-party pages (not used) claim a 40001-based convention (protocol address 99 for 40100). If reads time out or return the wrong word on a real drive, try address-1. Scaling of the output frequency register is not stated in the notes read, so it is shown raw. HSW value range -16384 to +16384 is the range printed for the LOGO! tag; the note does not say what physical value 16384 represents (commonly 100 percent, not confirmed in the documents read). STW1 bits (S7-1200 note): 0 ON/OFF1, 1 OFF2 (low = enabled stop), 2 OFF3 fast stop (low = enabled), 3 pulse enable, 4 RFG enable, 5 RFG start, 6 setpoint enable, 7 error acknowledge, 8 JOG right, 9 JOG left, 10 control from PLC, 11 reversing, 13 motor potentiometer higher, 14 lower, 15 manual/auto. ZSW1 bits: 0 drive ready, 1 ready to run, 2 running, 3 fault active, 4 OFF2 active, 5 OFF3 active, 6 ON inhibit active, 7 warning active, 8 setpoint/actual deviation, 9 PZD control, 10 |f actual| >= P1082 (fmax), 11 motor current limit warning, 12 holding brake active, 13 motor overload, 14 motor runs right, 15 inverter overload. Parameters used in the LOGO! example for Modbus RTU (macro Cn011): P2010[0] baud rate code 6 (the same note sets baud 9600 on the master), P2014[0] telegram off time 100 ms, P2021 Modbus address 1, P2023 RS485 protocol = 2. The note says the drive does not accept STW1 = 0000h or HSW = 0.0 and raises F72 when no telegram arrives within the telegram off time. Their Modbus register addresses for reading these parameters are not in the notes read, so they are not included. Written data lives in RAM; P0971 = 21 transfers RAM to EEPROM (note). Function codes used: 03 and 06. SAFETY: STW (40100) and HSW (40101) in group 'control' start/stop and set the speed of a real motor; marked rw because the notes call them write and read access. The drive-side limits for HSW follow its own parameters, not enforced here beyond the documented +/-16384.",
+ "connection": {
+  "type": "rtu",
+  "baud": 9600,
+  "unit": 1,
+  "timeout": 1.0
+ },
+ "address_base": 0,
+ "points": [
+  {
+   "name": "Output Frequency (40024)",
+   "address": 24,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Register 40024, read-only. Scaling not stated in the notes read."
+  },
+  {
+   "name": "STW Control Word (40100)",
+   "address": 100,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "group": "control",
+   "sim": 0,
+   "note": "Register 40100. COMMANDS REAL MACHINERY. Bit table in preset notes; start/stop word values were not taken from a Siemens document."
+  },
+  {
+   "name": "HSW Main Setpoint (40101)",
+   "address": 101,
+   "fc": 3,
+   "type": "int16",
+   "access": "rw",
+   "min": -16384,
+   "max": 16384,
+   "group": "control",
+   "sim": 0,
+   "note": "Register 40101. COMMANDS REAL MACHINERY. Range as printed in the LOGO! note."
+  },
+  {
+   "name": "ZSW Status Word (40110)",
+   "address": 110,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Register 40110, read-only; bit table in preset notes."
+  }
+ ]
+}

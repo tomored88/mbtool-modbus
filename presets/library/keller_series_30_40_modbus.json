@@ -1,0 +1,222 @@
+{
+  "name": "KELLER Series 30 / Series 40 digital pressure transmitter (RS485 Modbus RTU)",
+  "manufacturer": "KELLER",
+  "model": "Series 30, Series 30 X2 and Series 40 (Class.Group 5.20 / 5.21)",
+  "source": [
+    "https://core.instrumart.com/assets/Keller-CommunicationProtocol.pdf"
+  ],
+  "doc_revision": "Description of the Communication protocol for Series 30 and Series 40, Class.Group 5.20/5.21, Version 3.4, 14 October 2015",
+  "verified": false,
+  "notes": "Register map is section 4.9 'MODBUS Register Map'. Addressing: the table gives hex start addresses (StAdd), and the manual's examples (frame '1 3 0 2 0 2' reading P1 at StAdd 0x0002) show they are used directly as protocol addresses, address_base=0; 'address' is the hex value converted to decimal (0x0200=512, 0x0380=896, 0x03A0=928). Only function 3 (read) is guaranteed on all firmware; F6/F8/F16 need 5.20-12.28 or later. Request size limit: 4 registers per read for 5.20-10.40 and later (80 for 5.21), 2 for older firmware - max_block is set to 4 and the double-sized process values must be read in one request. If you have older firmware (5.20-5.50 or below 10.40) you need max_block 2 and the int/config registers will not all exist. Float format: IEEE 754, high word first; NaN means inactive channel or error. The pressure channels P1/P2 are in bar and temperatures in degC as stated by the manual, but whether a given channel is gauge/absolute is the 'P-Mode' (not modelled). Serial: 8 data bits, no parity (default), 1 stop bit, 9600 baud (default) or 115200; the default Modbus address is NOT stated (the connection unit=1 is a placeholder; address 250 is the Keller non-bus point-to-point address and is not a valid Modbus unicast address). Modbus RTU only, CRC16 low byte first. Coefficient writes (offset/gain) are calibration; the zero-point and reset commands (0xFF04 etc.), the analog-output scaling, filter settings and conductivity channels were not included. Combined 5.20/5.21 families: some listed registers exist only on one of them (noted per point).",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "max_block": 4,
+  "points": [
+    {
+      "name": "CH0 Calculated Value",
+      "address": 0,
+      "fc": 3,
+      "type": "float32",
+      "unit": "",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "32 bit IEEE 754 float, high word first (HWord at the lower register, standard byte order). Read each channel in one request (2 registers). NaN is returned for an inactive channel (firmware 5.20-10.40 and later), +/-infinity for overflow. 'Calculated value (customer specific format)': unit/meaning depends on the CFG_CH0 setting."
+    },
+    {
+      "name": "P1 Pressure",
+      "address": 2,
+      "fc": 3,
+      "type": "float32",
+      "unit": "bar",
+      "group": "measure",
+      "sim": 1.013,
+      "note": "32 bit IEEE 754 float, high word first (HWord at the lower register, standard byte order). Read each channel in one request (2 registers). NaN is returned for an inactive channel (firmware 5.20-10.40 and later), +/-infinity for overflow."
+    },
+    {
+      "name": "P2 Pressure",
+      "address": 4,
+      "fc": 3,
+      "type": "float32",
+      "unit": "bar",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "32 bit IEEE 754 float, high word first (HWord at the lower register, standard byte order). Read each channel in one request (2 registers). NaN is returned for an inactive channel (firmware 5.20-10.40 and later), +/-infinity for overflow."
+    },
+    {
+      "name": "T Temperature",
+      "address": 6,
+      "fc": 3,
+      "type": "float32",
+      "unit": "degC",
+      "group": "measure",
+      "sim": 21.5,
+      "note": "32 bit IEEE 754 float, high word first (HWord at the lower register, standard byte order). Read each channel in one request (2 registers). NaN is returned for an inactive channel (firmware 5.20-10.40 and later), +/-infinity for overflow."
+    },
+    {
+      "name": "TOB1 Temperature of Sensor 1",
+      "address": 8,
+      "fc": 3,
+      "type": "float32",
+      "unit": "degC",
+      "group": "measure",
+      "sim": 21.5,
+      "note": "32 bit IEEE 754 float, high word first (HWord at the lower register, standard byte order). Read each channel in one request (2 registers). NaN is returned for an inactive channel (firmware 5.20-10.40 and later), +/-infinity for overflow."
+    },
+    {
+      "name": "TOB2 Temperature of Sensor 2",
+      "address": 10,
+      "fc": 3,
+      "type": "float32",
+      "unit": "degC",
+      "group": "measure",
+      "sim": 0.0,
+      "note": "32 bit IEEE 754 float, high word first (HWord at the lower register, standard byte order). Read each channel in one request (2 registers). NaN is returned for an inactive channel (firmware 5.20-10.40 and later), +/-infinity for overflow."
+    },
+    {
+      "name": "P1 Pressure (integer)",
+      "address": 34,
+      "fc": 3,
+      "type": "int32",
+      "unit": "Pa",
+      "group": "measure_int",
+      "sim": 101300,
+      "note": "Process value 32 bit signed integer in Pa (10^-5 bar); firmware 5.20-12.28 and later / 5.21 only. Overflow 2147483647."
+    },
+    {
+      "name": "T Temperature (integer)",
+      "address": 38,
+      "fc": 3,
+      "type": "int32",
+      "scale": 0.01,
+      "unit": "degC",
+      "group": "measure_int",
+      "sim": 21.5,
+      "note": "Signed 32 bit, 1/100 degC; firmware 5.20-12.28 and later / 5.21 only."
+    },
+    {
+      "name": "UART Settings",
+      "address": 512,
+      "fc": 3,
+      "type": "uint16",
+      "access": "r",
+      "group": "config",
+      "sim": 0,
+      "note": "Bit0-3 baud: 0 = 9600, 1 = 115200; bit4 parity enable; bit5 parity mode (0 odd, 1 even); bit6 stop bits (0 = 1, 1 = 2, firmware 5.21 only). Documented R/W; left read-only (a wrong write would lock you out)."
+    },
+    {
+      "name": "Serial Number",
+      "address": 514,
+      "fc": 3,
+      "type": "uint32",
+      "group": "info",
+      "sim": 123456,
+      "note": "Registers S/N-H (0x0202) and S/N-L (0x0203)."
+    },
+    {
+      "name": "Active Pressure Channels",
+      "address": 516,
+      "fc": 3,
+      "type": "uint16",
+      "group": "info",
+      "sim": 2,
+      "note": "CFG_P bit mask: bit1 P1, bit2 P2."
+    },
+    {
+      "name": "Active Temperature Channels",
+      "address": 517,
+      "fc": 3,
+      "type": "uint16",
+      "group": "info",
+      "sim": 8,
+      "note": "CFG_T bit mask: bit3 T, bit4 TOB1, bit5 TOB2, bit7 conductivity (5.21 only)."
+    },
+    {
+      "name": "Status",
+      "address": 524,
+      "fc": 3,
+      "type": "uint16",
+      "group": "status",
+      "sim": 0,
+      "note": "Register 0x020C: same as the STAT byte of the Keller bus function F73."
+    },
+    {
+      "name": "Device Address",
+      "address": 525,
+      "fc": 3,
+      "type": "uint16",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "sim": 1,
+      "note": "Register 0x020D (DEV_ADDR). R/W in firmware 5.20-10.XX and later. Writing it moves the device. Modbus unicast range 1..247."
+    },
+    {
+      "name": "Firmware Class:Group",
+      "address": 526,
+      "fc": 3,
+      "type": "uint16",
+      "group": "info",
+      "sim": 1300,
+      "note": "Register 0x020E, only firmware 5.20-12.28 and later / 5.21."
+    },
+    {
+      "name": "Firmware Year:Week",
+      "address": 527,
+      "fc": 3,
+      "type": "uint16",
+      "group": "info",
+      "sim": 2576,
+      "note": "Register 0x020F, only firmware 5.20-12.28 and later / 5.21."
+    },
+    {
+      "name": "P1 Minimum Pressure",
+      "address": 928,
+      "fc": 3,
+      "type": "float32",
+      "unit": "bar",
+      "group": "info",
+      "sim": 0.0,
+      "note": "Coefficient range 0x03A0 (Coeff-No. 80), read only."
+    },
+    {
+      "name": "P1 Maximum Pressure",
+      "address": 930,
+      "fc": 3,
+      "type": "float32",
+      "unit": "bar",
+      "group": "info",
+      "sim": 3.0,
+      "note": "0x03A2 (Coeff-No. 81), read only."
+    },
+    {
+      "name": "P1 Offset",
+      "address": 896,
+      "fc": 3,
+      "type": "float32",
+      "unit": "bar",
+      "access": "rw",
+      "group": "config",
+      "sim": 0.0,
+      "note": "0x0380 (Coeff-No. 64), default 0.0. ZERO OFFSET OF THE PRESSURE CHANNEL - changes the reading. The manual says coefficients may only be written with function 16 (2 registers)."
+    },
+    {
+      "name": "P1 Gain Factor",
+      "address": 898,
+      "fc": 3,
+      "type": "float32",
+      "access": "rw",
+      "group": "config",
+      "sim": 1.0,
+      "note": "0x0382 (Coeff-No. 65), default 1.0. SPAN/GAIN OF THE PRESSURE CHANNEL - changes the reading. Written with function 16 only."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+pyserial>=3.5
+# only needed for the MCP server (mbtool_mcp.py); the GUI and CLI work without it:
+mcp>=2.0,<3
+# only used by test_core.py (cross-checks against an independent implementation):
+pymodbus>=3.7,<4

@@ -1,0 +1,149 @@
+{
+  "name": "Chint DDSU666 (single phase, DIN rail)",
+  "manufacturer": "Chint (Zhejiang CHINT Instrument & Meter)",
+  "model": "DDSU666",
+  "source": [
+    "https://discourse.nodered.org/uploads/short-url/xuTjZoOuRpTGQy6Zn8fNWJE0Lpu.pdf"
+  ],
+  "doc_revision": "'Type DDSU666.004.0006 Single phase electronic energy meter (DIN-Rail) Operation Manual', cover no. ZTY0.464.1224, May 2019 (page headers show ZTY0.464.1036). Appendix A = Modbus-RTU protocol.",
+  "verified": false,
+  "notes": "Built only from the manual above (Table 9 'Communication parameter information'; address column printed in hex as 0000H, 2000H, 4000H = protocol start addresses). Conversion: address_base 0, point address = the hex value converted to decimal (e.g. 2000H -> 8192, 4000H -> 16384, 0006H -> 6); no offset applied. Function codes per Appendix A: 03H read registers, 10H write multiple registers. FC04 is not mentioned in the manual, so every point uses fc 3. Measured values are 2-register single-precision floats; the manual does not state their byte/word order. Units: the manual states P in kW and Q in kvar ('the unit is KW / Kvar'); V and A per the display table; energy 'Ep' unit is not given in the register table (display shows kWh). Values are labelled 'electric quantity of the secondary side' in the manual. Config registers are 16-bit signed ('16-bit with symbols'). Baud codes (1:2400, 2:4800, 3:9600) from the note under the table (the prose also lists 1200 bps as possible but gives no code). Protocol switch register: 2 = Modbus RTU, 1 = DL/T 645-2007 (switching away from Modbus will stop Modbus comms). Address range in the keyboard section is 1-99; Appendix A allows 1-247. Default serial parameters and default address are NOT stated as such; the 'connection' block (9600 / no parity / 1 stop) is only the example shown in the manual's display table (9600 baud, 8 data bits, no parity, 1 stop bit) and unit is left to the tool default. Left out: 0002H 'ClrE' energy clear (write 1), reserved registers. Newer Chinese manual ZTW0.464.0090 (2023) exists at aiot.chint.com but its text could not be read. Not verified against a physical device.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Voltage",
+      "address": 8192,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Single-precision float; the document does not state the word/byte order of its floats. word_order 'big' (tool default) is an ASSUMPTION - check on a device. Secondary side."
+    },
+    {
+      "name": "Current",
+      "address": 8194,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure",
+      "note": "Single-precision float; the document does not state the word/byte order of its floats. word_order 'big' (tool default) is an ASSUMPTION - check on a device."
+    },
+    {
+      "name": "Active power",
+      "address": 8196,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kW",
+      "access": "r",
+      "group": "measure",
+      "note": "Single-precision float; the document does not state the word/byte order of its floats. word_order 'big' (tool default) is an ASSUMPTION - check on a device. Doc: 'Conjunction active power, the unit is KW'."
+    },
+    {
+      "name": "Reactive power",
+      "address": 8198,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvar",
+      "access": "r",
+      "group": "measure",
+      "note": "Single-precision float; the document does not state the word/byte order of its floats. word_order 'big' (tool default) is an ASSUMPTION - check on a device. Doc: 'the unit is Kvar'."
+    },
+    {
+      "name": "Power factor",
+      "address": 8202,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Single-precision float; the document does not state the word/byte order of its floats. word_order 'big' (tool default) is an ASSUMPTION - check on a device."
+    },
+    {
+      "name": "Frequency",
+      "address": 8206,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "Hz",
+      "access": "r",
+      "group": "measure",
+      "note": "Single-precision float; the document does not state the word/byte order of its floats. word_order 'big' (tool default) is an ASSUMPTION - check on a device."
+    },
+    {
+      "name": "Active energy",
+      "address": 16384,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy",
+      "note": "Single-precision float; the document does not state the word/byte order of its floats. word_order 'big' (tool default) is an ASSUMPTION - check on a device. Doc name 'Ep', 'Active in electricity'; unit not stated in the register table (display shows kWh). No separate import/export registers are listed."
+    },
+    {
+      "name": "Version (REV)",
+      "address": 1,
+      "fc": 3,
+      "type": "int16",
+      "access": "r",
+      "group": "config",
+      "note": "Doc: 'Reserved, actual read is the version number'. 16-bit signed."
+    },
+    {
+      "name": "Protocol",
+      "address": 5,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": 1,
+      "max": 2,
+      "group": "config",
+      "enum": {
+        "1": "DL/T 645-2007",
+        "2": "Modbus RTU"
+      },
+      "note": "Doc: 'ChangeProtocol: data 2 for Modbus RTU, 1 for DL/T 645-2007'. Writing 1 switches the meter away from Modbus."
+    },
+    {
+      "name": "Communication address",
+      "address": 6,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "note": "Appendix A: address code 1 to 247; the front-key setting is limited to 1-99. Default not stated."
+    },
+    {
+      "name": "Baud rate",
+      "address": 12,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": 1,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "1": "2400 bps",
+        "2": "4800 bps",
+        "3": "9600 bps"
+      },
+      "note": "Codes as printed under Table 9 ('BAud rate: 1:2400bps; 2:4800bps; 3:9600bps')."
+    }
+  ]
+}

@@ -1,0 +1,408 @@
+{
+  "name": "Chint DTSU666 (three phase, DIN rail)",
+  "manufacturer": "Chint (Zhejiang CHINT Instrument & Meter)",
+  "model": "DTSU666",
+  "source": [
+    "https://media.adeo.com/media/5298790/media.pdf",
+    "https://gk146.mysky-shop.pl/upload/gk146/files/fcd92ce7e7f207959c27a47bfab0c5f0/DTSU666%20THREE%20PHASES%20MANUAL.PDF"
+  ],
+  "doc_revision": "Registers: 'Quick operation manual of DTSU666-series and DSSU666-series Digital Three-Phase Energy Meter' (Table 3 ModBus Register Address; publication date May 2016). Settings/defaults/ranges: 'DTSU666 series and DSSU666 series three phase electronic energy meter (DIN-Rail) Operation manual' ZTY0.464.1002 (Zhejiang Chint).",
+  "verified": false,
+  "notes": "Registers come from Table 3 of the quick manual (first source; page images were read because the PDF text layer is scrambled). The full manual ZTY0.464.1002 (second source) only gives the programming parameters and says the full register table is 'available on request'; it was used for ranges/baud codes/defaults. Addressing: the table prints hex protocol addresses (2000H, 401EH, 0006H ...); this preset uses address_base 0 and the hex value as decimal address, no offset. Functions: ZTY0.464.1002 says the Modbus-RTU protocol reads with 03H and writes with 10H; FC04 is not mentioned, so all points use fc 3. Data type: 'Floating Inverse(AB CD)' 2 words - the word order is ambiguous (see point notes). The quick manual also prints a 'Table 1' of conversion formulas (e.g. U = URMS x (UrAt x 0.1) x 0.1, F = Freq x 0.01, PF = PFx x 0.001, Ep = E x UrAt x IrAt) and says communicated data are 'quadratic numerical, complement numbers'; these seem to describe integer data and contradict the float type, so NO scaling is applied here. Values are labelled 'secondary side' (multiply by CT/PT ratios for primary values) - unverified how the meter reports them. Defaults conflict between the two documents: ZTY0.464.1002 says the factory default is Modbus-RTU, 9600 bps, n.1 (no parity, 1 stop), address 1; the quick manual says factory default is DL/T 645-2007 (E.1, 9600), and the Modbus-RTU parameters Parity n.2, 9600 bps, address 'see label'. The 'connection' block uses 9600 / N / 1 stop (ZTY0.464.1002) and should be checked. Registers 0000H-0034H also include time registers (second..year) and others that were left out; energy-clear 0002H left out. Search results note some OEM-branded firmware uses different registers; this preset is only the Chint manual map. Not verified against a physical device.",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Voltage Uab",
+      "address": 8192,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Quick manual type column reads 'Floating Inverse(AB CD)', 2 words. Meaning of 'Inverse' is unclear; word_order 'big' (ABCD) is chosen from the literal '(AB CD)' - check on a device. Doc: line-line voltage (invalid for 3-phase 4-wire)."
+    },
+    {
+      "name": "Voltage Ubc",
+      "address": 8194,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Line-line voltage (invalid for 3-phase 4-wire)."
+    },
+    {
+      "name": "Voltage Uca",
+      "address": 8196,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Line-line voltage (invalid for 3-phase 4-wire)."
+    },
+    {
+      "name": "Voltage Ua",
+      "address": 8198,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc labels the Ua/Ub/Uc rows 'Phase-phase voltage ... (invalid for 3 phase 3 wire)', apparently a typo for phase voltage."
+    },
+    {
+      "name": "Voltage Ub",
+      "address": 8200,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Voltage Uc",
+      "address": 8202,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Current Ia",
+      "address": 8204,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Current Ib",
+      "address": 8206,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure",
+      "note": "Invalid when three-phase three-wire."
+    },
+    {
+      "name": "Current Ic",
+      "address": 8208,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total active power",
+      "address": 8210,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc 'Pt', combined active power, unit W."
+    },
+    {
+      "name": "Active power Pa",
+      "address": 8212,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Active power Pb",
+      "address": 8214,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure",
+      "note": "Invalid when three-phase three-wire."
+    },
+    {
+      "name": "Active power Pc",
+      "address": 8216,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total reactive power",
+      "address": 8218,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "var",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc 'Qt', unit var."
+    },
+    {
+      "name": "Reactive power Qa",
+      "address": 8220,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "var",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Reactive power Qb",
+      "address": 8222,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "var",
+      "access": "r",
+      "group": "measure",
+      "note": "Invalid when three-phase three-wire."
+    },
+    {
+      "name": "Reactive power Qc",
+      "address": 8224,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "var",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total power factor",
+      "address": 8234,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc 'PFt'."
+    },
+    {
+      "name": "Power factor PFa",
+      "address": 8236,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Invalid when three-phase three-wire (per doc)."
+    },
+    {
+      "name": "Power factor PFb",
+      "address": 8238,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Invalid when three-phase three-wire (per doc)."
+    },
+    {
+      "name": "Power factor PFc",
+      "address": 8240,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Invalid when three-phase three-wire (per doc)."
+    },
+    {
+      "name": "Frequency",
+      "address": 8260,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "Hz",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total active power demand",
+      "address": 8272,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure",
+      "note": "Doc 'DmPt'."
+    },
+    {
+      "name": "Import active energy",
+      "address": 16414,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc 'ImpEp': (current) positive active total energy. Unit kWh per doc Table 1."
+    },
+    {
+      "name": "Export active energy",
+      "address": 16424,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc 'ExpEp': (current) negative active total energy."
+    },
+    {
+      "name": "Quadrant 1 reactive energy",
+      "address": 16434,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc 'Q1Eq'."
+    },
+    {
+      "name": "Quadrant 2 reactive energy",
+      "address": 16444,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc 'Q2Eq'."
+    },
+    {
+      "name": "Quadrant 3 reactive energy",
+      "address": 16454,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc 'Q3Eq'."
+    },
+    {
+      "name": "Quadrant 4 reactive energy",
+      "address": 16464,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc 'Q4Eq'."
+    },
+    {
+      "name": "Wiring mode (net)",
+      "address": 3,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": 0,
+      "max": 1,
+      "group": "config",
+      "enum": {
+        "0": "3P4W",
+        "1": "3P3W"
+      },
+      "note": "Quick manual: 'Selecting of the connection mode net (0:3P4W, 1:3P3W)'."
+    },
+    {
+      "name": "Current transformer ratio (IrAt)",
+      "address": 6,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": 1,
+      "max": 9999,
+      "group": "config",
+      "note": "Range 1-9999 from the full manual (ZTY0.464.1002, Table 5 'Ct')."
+    },
+    {
+      "name": "Potential transformer ratio (UrAt)",
+      "address": 7,
+      "fc": 3,
+      "type": "int16",
+      "scale": 0.1,
+      "access": "rw",
+      "min": 0.1,
+      "max": 999.9,
+      "group": "config",
+      "note": "Quick manual: parameters marked (*) = communication value x 0.1; range 0.1-999.9 from ZTY0.464.1002 Table 5 'Pt'. Quick manual note: when Pt is 1 the register value is 10."
+    },
+    {
+      "name": "Protocol",
+      "address": 44,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "1": "DL/T 645-2007"
+      },
+      "note": "Register 'Protocol changing-over'. Only code 1 (DL/T 645-2007) is stated in the manuals; the code for Modbus RTU is not stated, so it is not listed in the enum. Writing this can switch the meter away from Modbus."
+    },
+    {
+      "name": "Communication address",
+      "address": 45,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "note": "Range 1-247 from ZTY0.464.1002 Table 5 'Addr'. Default 1 per that manual; the quick manual says 'see label'."
+    },
+    {
+      "name": "Baud rate",
+      "address": 46,
+      "fc": 3,
+      "type": "int16",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "1200 bps",
+        "1": "2400 bps",
+        "2": "4800 bps",
+        "3": "9600 bps"
+      },
+      "note": "Codes from ZTY0.464.1002 Table 5 'bAud' (front-key programming parameter); the Modbus register is listed as 'Communication baud rate' in the quick manual."
+    }
+  ]
+}

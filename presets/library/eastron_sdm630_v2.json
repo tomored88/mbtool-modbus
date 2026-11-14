@@ -1,0 +1,1039 @@
+{
+  "name": "Eastron SDM630-Modbus (V2 family)",
+  "manufacturer": "Eastron",
+  "model": "SDM630 Modbus V2",
+  "source": [
+    "https://communityarchive.victronenergy.com/storage/attachments/sdm630-modbus-protocol.pdf"
+  ],
+  "doc_revision": "Eastron SDM630Modbus Smart Meter Modbus Protocol Implementation V1.8 (22-page PDF, copy hosted by the Victron community archive). The document does NOT say 'V2'.",
+  "verified": false,
+  "notes": "IMPORTANT: the only register document I could actually read is the SDM630Modbus protocol V1.8 (above); it does not mention the 'V2' hardware, and I could not find or read a protocol document explicitly for SDM630-Modbus V2. The V2 user manual (docs.vekto.nl) was not used for registers. Treat this preset as 'SDM630Modbus protocol V1.8' and check against your V2 unit. Addressing: the doc lists register numbers (3xxxx input / 4xxxx holding) plus the protocol start address in hex; this preset uses address_base 0 and the PROTOCOL address = input register number minus 30001 (30073 -> 72 = 0x0048) / holding minus 40001; every address was cross-checked against the doc's hex column (read from the rendered tables because the PDF text extraction is scrambled). Data: 32-bit IEEE754 float, 'most significant register first (Default)' unless the 'Register Order' holding parameter is changed (that parameter's address is not listed in the doc, so it is not included). Doc limits: max 40 values (80 registers) per request, even-aligned pairs only. NOTE the tool's block merger allows up to 125 registers per read, which exceeds this device limit; read by group or point. The doc's table has per-wiring-system columns (3P4W/3P3W/1P2W): parameters crossed out for a wiring system return 0. Defaults per the doc: node 1, no parity/1 stop bit (code 0), baud code 2 = 9600 (default); selectable 2400/4800/9600/19200/38400. Left out: password entry register 40025 (0x0018) , 'Reset' register 461457 (0xF010, write-only), Register Order (no address). 'System type' is marked r/w but the doc says it requires the password first. In the doc's units column, row 'Maximum total system power demand' says VA and 'Total system power demand' says W; taken as printed. Not verified against a physical device. max_block=40: the protocol document limits one request to 40 values (80 registers).",
+  "connection": {
+    "type": "rtu",
+    "baud": 9600,
+    "parity": "N",
+    "stop": 1,
+    "data": 8,
+    "unit": 1,
+    "timeout": 1.0
+  },
+  "address_base": 0,
+  "points": [
+    {
+      "name": "Voltage L1",
+      "address": 0,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Phase to neutral volts."
+    },
+    {
+      "name": "Voltage L2",
+      "address": 2,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Phase to neutral volts."
+    },
+    {
+      "name": "Voltage L3",
+      "address": 4,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure",
+      "note": "Phase to neutral volts."
+    },
+    {
+      "name": "Current L1",
+      "address": 6,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Current L2",
+      "address": 8,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Current L3",
+      "address": 10,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Active power L1",
+      "address": 12,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Active power L2",
+      "address": 14,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Active power L3",
+      "address": 16,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Apparent power L1",
+      "address": 18,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Apparent power L2",
+      "address": 20,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Apparent power L3",
+      "address": 22,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Reactive power L1",
+      "address": 24,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VAr",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Reactive power L2",
+      "address": 26,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VAr",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Reactive power L3",
+      "address": 28,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VAr",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Power factor L1",
+      "address": 30,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Sign indicates current direction (doc note 1: positive = forward, negative = reverse)."
+    },
+    {
+      "name": "Power factor L2",
+      "address": 32,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Sign indicates current direction (doc note 1: positive = forward, negative = reverse)."
+    },
+    {
+      "name": "Power factor L3",
+      "address": 34,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Sign indicates current direction (doc note 1: positive = forward, negative = reverse)."
+    },
+    {
+      "name": "Phase angle L1",
+      "address": 36,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "deg",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Phase angle L2",
+      "address": 38,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "deg",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Phase angle L3",
+      "address": 40,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "deg",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Average line to neutral voltage",
+      "address": 42,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Average line current",
+      "address": 46,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Sum of line currents",
+      "address": 48,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total system power",
+      "address": 52,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total system apparent power",
+      "address": 56,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total system reactive power",
+      "address": 60,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VAr",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total system power factor",
+      "address": 62,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "measure",
+      "note": "Sign indicates current direction (doc note 1)."
+    },
+    {
+      "name": "Total system phase angle",
+      "address": 66,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "deg",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Frequency",
+      "address": 70,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "Hz",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Total import active energy",
+      "address": 72,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total export active energy",
+      "address": 74,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total import reactive energy",
+      "address": 76,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total export reactive energy",
+      "address": 78,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total apparent energy",
+      "address": 80,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kVAh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total charge",
+      "address": 82,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "Ah",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc parameter 'Ah', unit Ah."
+    },
+    {
+      "name": "Total system power demand",
+      "address": 84,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "W",
+      "access": "r",
+      "group": "demand",
+      "note": "Doc unit column says W; doc note 2: power sum demand is import - export."
+    },
+    {
+      "name": "Maximum total system power demand",
+      "address": 86,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "demand",
+      "note": "Doc unit column says VA for this row (the previous row says W); taken as printed."
+    },
+    {
+      "name": "Total system VA demand",
+      "address": 100,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum total system VA demand",
+      "address": 102,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "VA",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Neutral current demand",
+      "address": 104,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum neutral current demand",
+      "address": 106,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Line 1 to Line 2 voltage",
+      "address": 200,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Line 2 to Line 3 voltage",
+      "address": 202,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Line 3 to Line 1 voltage",
+      "address": 204,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Average line to line voltage",
+      "address": 206,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "V",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Neutral current",
+      "address": 224,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "measure"
+    },
+    {
+      "name": "Voltage THD L1",
+      "address": 234,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd",
+      "note": "Phase L/N volts THD."
+    },
+    {
+      "name": "Voltage THD L2",
+      "address": 236,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd",
+      "note": "Phase L/N volts THD."
+    },
+    {
+      "name": "Voltage THD L3",
+      "address": 238,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd",
+      "note": "Phase L/N volts THD."
+    },
+    {
+      "name": "Current THD L1",
+      "address": 240,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Current THD L2",
+      "address": 242,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Current THD L3",
+      "address": 244,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Average line to neutral voltage THD",
+      "address": 248,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Average line current THD",
+      "address": 250,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Current demand L1",
+      "address": 258,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Current demand L2",
+      "address": 260,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Current demand L3",
+      "address": 262,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum current demand L1",
+      "address": 264,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum current demand L2",
+      "address": 266,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Maximum current demand L3",
+      "address": 268,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "A",
+      "access": "r",
+      "group": "demand"
+    },
+    {
+      "name": "Line 1 to line 2 voltage THD",
+      "address": 334,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Line 2 to line 3 voltage THD",
+      "address": 336,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Line 3 to line 1 voltage THD",
+      "address": 338,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Average line to line voltage THD",
+      "address": 340,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "%",
+      "access": "r",
+      "group": "thd"
+    },
+    {
+      "name": "Total active energy",
+      "address": 342,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc note 3: total = import + export."
+    },
+    {
+      "name": "Total reactive energy",
+      "address": 344,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy",
+      "note": "Doc note 3: total = import + export."
+    },
+    {
+      "name": "Import active energy L1",
+      "address": 346,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Import active energy L2",
+      "address": 348,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Import active energy L3",
+      "address": 350,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export active energy L1",
+      "address": 352,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export active energy L2",
+      "address": 354,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export active energy L3",
+      "address": 356,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total active energy L1",
+      "address": 358,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total active energy L2",
+      "address": 360,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total active energy L3",
+      "address": 362,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kWh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Import reactive energy L1",
+      "address": 364,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Import reactive energy L2",
+      "address": 366,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Import reactive energy L3",
+      "address": 368,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export reactive energy L1",
+      "address": 370,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export reactive energy L2",
+      "address": 372,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Export reactive energy L3",
+      "address": 374,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total reactive energy L1",
+      "address": 376,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total reactive energy L2",
+      "address": 378,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Total reactive energy L3",
+      "address": 380,
+      "fc": 4,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "kvarh",
+      "access": "r",
+      "group": "energy"
+    },
+    {
+      "name": "Demand period",
+      "address": 2,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "min",
+      "access": "rw",
+      "min": 0,
+      "max": 60,
+      "group": "config",
+      "note": "Doc: 0, 5, 8, 10, 15, 20, 30 or 60 minutes, default 60 (only these values are valid; min/max are the extremes). 0 = demand shows the current value. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "System type",
+      "address": 10,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 1,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "1": "1p2w",
+        "2": "3p3w",
+        "3": "3p4w"
+      },
+      "note": "Doc mode 'r/wp': read/write but requires the password to be entered first (password register 40025). Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Pulse 1 width",
+      "address": 12,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "unit": "ms",
+      "access": "rw",
+      "min": 60,
+      "max": 200,
+      "group": "config",
+      "note": "Doc: relay on period in ms: 60, 100 or 200, default 100 (min/max are the extremes). Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Password lock status",
+      "address": 14,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "r",
+      "group": "config",
+      "enum": {
+        "0": "Locked",
+        "1": "Unlocked"
+      },
+      "note": "Doc mode 'r'. Reading it resets the password timeout to one minute. (Doc also says writing any value re-locks.) Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Network parity/stop",
+      "address": 18,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 0,
+      "max": 3,
+      "group": "config",
+      "enum": {
+        "0": "1 stop bit, no parity (default)",
+        "1": "1 stop bit, even parity",
+        "2": "1 stop bit, odd parity",
+        "3": "2 stop bits, no parity"
+      },
+      "note": "Requires a restart to become effective. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Network node (Modbus address)",
+      "address": 20,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 1,
+      "max": 247,
+      "group": "config",
+      "note": "Doc: 1 to 247, default 1; requires a restart. Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Pulse 1 divisor",
+      "address": 22,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 0,
+      "max": 5,
+      "group": "config",
+      "enum": {
+        "0": "0.0025 kWh(kvarh)/imp",
+        "1": "0.01 kWh(kvarh)/imp",
+        "2": "0.1 kWh(kvarh)/imp",
+        "3": "1 kWh(kvarh)/imp",
+        "4": "10 kWh(kvarh)/imp",
+        "5": "100 kWh(kvarh)/imp"
+      },
+      "note": "Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Network baud rate",
+      "address": 28,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "min": 0,
+      "max": 4,
+      "group": "config",
+      "enum": {
+        "0": "2400",
+        "1": "4800",
+        "2": "9600 (default)",
+        "3": "19200",
+        "4": "38400"
+      },
+      "note": "Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Pulse 1 energy type",
+      "address": 86,
+      "fc": 3,
+      "type": "float32",
+      "word_order": "big",
+      "access": "rw",
+      "group": "config",
+      "enum": {
+        "1": "Import active energy",
+        "2": "Total active energy",
+        "4": "Export active energy (default)",
+        "5": "Import reactive energy",
+        "6": "Total reactive energy",
+        "8": "Export reactive energy"
+      },
+      "note": "Holding register that stores the value as a 32-bit IEEE754 float (2 registers, 4 bytes); doc: write only one parameter per message, FC16."
+    },
+    {
+      "name": "Serial number",
+      "address": 64512,
+      "fc": 3,
+      "type": "uint32",
+      "word_order": "big",
+      "access": "r",
+      "group": "config",
+      "note": "Doc: unsigned int32, read only (register 464513). Word order not stated; big is an assumption."
+    }
+  ],
+  "max_block": 40
+}

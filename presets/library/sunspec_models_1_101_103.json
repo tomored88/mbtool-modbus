@@ -1,0 +1,437 @@
+{
+  "device_type": "meter",
+ "name": "SunSpec Common Model 1 + Inverter Models 101/102/103",
+ "manufacturer": "SunSpec Alliance (generic, vendor-independent)",
+ "model": "SunSpec models 1, 101 (single phase), 102 (split phase), 103 (three phase)",
+ "verified": false,
+ "source": [
+  "https://raw.githubusercontent.com/sunspec/models/master/json/model_1.json",
+  "https://raw.githubusercontent.com/sunspec/models/master/json/model_101.json",
+  "https://raw.githubusercontent.com/sunspec/models/master/json/model_103.json",
+  "https://github.com/SolarNetwork/solarnetwork/wiki/SunSpec-model-discovery"
+ ],
+ "doc_revision": "SunSpec Alliance model definitions (github.com/sunspec/models, master branch JSON as fetched 2026-11-03; no revision number stated). The base-address / 'SunS' marker / model-header facts come from the SolarNetwork wiki page, a secondary source; the SunSpec Information Model Specification itself (sunspec.org) returned HTTP 403 and was not read.",
+ "notes": "Built from the SunSpec model JSON definitions (point order and sizes as reported by a summarising fetch). NOT verified on a physical device. Address layout assumed: base register 40000 (0-based protocol address) holds the 32-bit 'SunS' marker (0x53756E53); other devices use base 50000 or 0 - shift all addresses accordingly (SunSpec allows 40000, 50000 or 0). Each model starts with a 2-register header (model ID, length of the rest). Model 1 header at base+2; with model 1 length L=66 (current JSON definition: Mn 16 + Md 16 + Opt 8 + Vr 8 + SN 16 + DA 1 + Pad 1 registers) the first inverter model header is at base+70 = 40070 and its data starts at 40072. The SolarNetwork example shows a device with L=65 for model 1; then the inverter model starts one register earlier. ALWAYS read the actual model-1 length (base+3) and model chain first; this preset assumes inverter model immediately follows model 1 with L=66. address_base is 0: if you use 1-based '4xxxx' numbering add 1 to these addresses in a manual, the preset's addresses are protocol addresses. Models 101, 102 and 103 share the same point layout (101: single phase, 102: split phase, 103: three phase); only the model ID differs, so one preset serves all three. Phase B/C and line-to-line points are not-implemented on single-phase devices. Inverter model offsets from model header: ID 0, L 1, A 2, AphA 3, AphB 4, AphC 5, A_SF 6, PPVphAB 7, PPVphBC 8, PPVphCA 9, PhVphA 10, PhVphB 11, PhVphC 12, V_SF 13, W 14, W_SF 15, Hz 16, Hz_SF 17, VA 18, VA_SF 19, VAr 20, VAr_SF 21, PF 22, PF_SF 23, WH 24-25, WH_SF 26, DCA 27, DCA_SF 28, DCV 29, DCV_SF 30, DCW 31, DCW_SF 32, TmpCab 33, TmpSnk 34, TmpTrns 35, TmpOt 36, Tmp_SF 37, St 38, StVnd 39, Evt1 40-41, Evt2 42-43, EvtVnd1-4 44-51. Offsets were computed by summing the sizes in the JSON order; point order was taken from model 101 and model 103 JSON (identical). Omitted for brevity: PPVphAB/BC/CA, TmpTrns, TmpOt, Evt2, EvtVnd1-4. Scale factors (sunssf) are dynamic: the preset shows RAW values and each *_SF point holds the exponent; the tool cannot apply them. Not-implemented sentinel values (e.g. 0x8000 / 0xFFFF) were not read from the specification and are not handled. String points of model 1 (Mn, Md, Opt, Vr, SN) are omitted because the schema has no string type (they occupy base+4 .. base+67). Device Address (DA) is marked rw because the model lists it as read-write; it changes the Modbus unit ID of the device. No other writable points are included. Connection defaults (port, baud) are not defined by SunSpec models, so 'connection' is empty.",
+ "connection": {},
+ "address_base": 0,
+ "points": [
+  {
+   "name": "SunS Identifier",
+   "address": 40000,
+   "fc": 3,
+   "type": "uint32",
+   "access": "r",
+   "group": "status",
+   "enum": {
+    "1400204883": "SunS"
+   },
+   "sim": 1400204883,
+   "note": "Well-known marker 0x53756E53 'SunS'; base register is 40000, 50000 or 0 depending on the device."
+  },
+  {
+   "name": "Common Model ID",
+   "address": 40002,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 1,
+   "note": "Model 1."
+  },
+  {
+   "name": "Common Model Length",
+   "address": 40003,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 66,
+   "note": "L; current JSON definition includes DA and Pad (66)."
+  },
+  {
+   "name": "Device Address (DA)",
+   "address": 40068,
+   "fc": 3,
+   "type": "uint16",
+   "access": "rw",
+   "min": 1,
+   "max": 247,
+   "group": "config",
+   "sim": 1,
+   "note": "Modbus device address, read-write, mandatory for Modbus RTU devices (1-247 per SunSpec). Writing changes the unit ID of the device."
+  },
+  {
+   "name": "Inverter Model ID",
+   "address": 40070,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "enum": {
+    "101": "Single phase",
+    "102": "Split phase",
+    "103": "Three phase"
+   },
+   "sim": 103,
+   "note": "Assumes the inverter model directly follows model 1 and model 1 length is 66."
+  },
+  {
+   "name": "Inverter Model Length",
+   "address": 40071,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 50
+  },
+  {
+   "name": "AC Current (A)",
+   "address": 40072,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "A",
+   "access": "r",
+   "group": "measure",
+   "sim": 105,
+   "note": "uint16 * 10^A_SF."
+  },
+  {
+   "name": "AC Current Phase A (AphA)",
+   "address": 40073,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "A",
+   "access": "r",
+   "group": "measure",
+   "sim": 35
+  },
+  {
+   "name": "AC Current Phase B (AphB)",
+   "address": 40074,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "A",
+   "access": "r",
+   "group": "measure",
+   "sim": 35
+  },
+  {
+   "name": "AC Current Phase C (AphC)",
+   "address": 40075,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "A",
+   "access": "r",
+   "group": "measure",
+   "sim": 35
+  },
+  {
+   "name": "A_SF",
+   "address": 40076,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": -1,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "Phase Voltage AN (PhVphA)",
+   "address": 40080,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "V",
+   "access": "r",
+   "group": "measure",
+   "sim": 2300
+  },
+  {
+   "name": "Phase Voltage BN (PhVphB)",
+   "address": 40081,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "V",
+   "access": "r",
+   "group": "measure",
+   "sim": 2301
+  },
+  {
+   "name": "Phase Voltage CN (PhVphC)",
+   "address": 40082,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "V",
+   "access": "r",
+   "group": "measure",
+   "sim": 2299
+  },
+  {
+   "name": "V_SF",
+   "address": 40083,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": -1,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "AC Power (W)",
+   "address": 40084,
+   "fc": 3,
+   "type": "int16",
+   "unit": "W",
+   "access": "r",
+   "group": "measure",
+   "sim": 7200,
+   "note": "int16 * 10^W_SF."
+  },
+  {
+   "name": "W_SF",
+   "address": 40085,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "Line Frequency (Hz)",
+   "address": 40086,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "Hz",
+   "access": "r",
+   "group": "measure",
+   "sim": 5001
+  },
+  {
+   "name": "Hz_SF",
+   "address": 40087,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": -2,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "AC Apparent Power (VA)",
+   "address": 40088,
+   "fc": 3,
+   "type": "int16",
+   "unit": "VA",
+   "access": "r",
+   "group": "measure",
+   "sim": 7210,
+   "note": "Optional in the model."
+  },
+  {
+   "name": "VA_SF",
+   "address": 40089,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "AC Reactive Power (VAr)",
+   "address": 40090,
+   "fc": 3,
+   "type": "int16",
+   "unit": "var",
+   "access": "r",
+   "group": "measure",
+   "sim": 100,
+   "note": "Optional in the model."
+  },
+  {
+   "name": "VAr_SF",
+   "address": 40091,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "AC Power Factor (PF)",
+   "address": 40092,
+   "fc": 3,
+   "type": "int16",
+   "unit": "%",
+   "access": "r",
+   "group": "measure",
+   "sim": 99,
+   "note": "Optional in the model."
+  },
+  {
+   "name": "PF_SF",
+   "address": 40093,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "AC Energy (WH)",
+   "address": 40094,
+   "fc": 3,
+   "type": "uint32",
+   "unit": "Wh",
+   "access": "r",
+   "group": "measure",
+   "sim": 12345678,
+   "note": "acc32 * 10^WH_SF, accumulator (high word first, as for all SunSpec 32-bit values)."
+  },
+  {
+   "name": "WH_SF",
+   "address": 40096,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "DC Current (DCA)",
+   "address": 40097,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "A",
+   "access": "r",
+   "group": "measure",
+   "sim": 190,
+   "note": "Optional in the model."
+  },
+  {
+   "name": "DCA_SF",
+   "address": 40098,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": -1,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "DC Voltage (DCV)",
+   "address": 40099,
+   "fc": 3,
+   "type": "uint16",
+   "unit": "V",
+   "access": "r",
+   "group": "measure",
+   "sim": 3800,
+   "note": "Optional in the model."
+  },
+  {
+   "name": "DCV_SF",
+   "address": 40100,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": -1,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "DC Power (DCW)",
+   "address": 40101,
+   "fc": 3,
+   "type": "int16",
+   "unit": "W",
+   "access": "r",
+   "group": "measure",
+   "sim": 7400,
+   "note": "Optional in the model."
+  },
+  {
+   "name": "DCW_SF",
+   "address": 40102,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "Cabinet Temperature (TmpCab)",
+   "address": 40103,
+   "fc": 3,
+   "type": "int16",
+   "unit": "C",
+   "access": "r",
+   "group": "measure",
+   "sim": 452
+  },
+  {
+   "name": "Heat Sink Temperature (TmpSnk)",
+   "address": 40104,
+   "fc": 3,
+   "type": "int16",
+   "unit": "C",
+   "access": "r",
+   "group": "measure",
+   "sim": 480,
+   "note": "Optional in the model."
+  },
+  {
+   "name": "Tmp_SF",
+   "address": 40107,
+   "fc": 3,
+   "type": "int16",
+   "access": "r",
+   "group": "status",
+   "sim": -1,
+   "note": "Scale factor (sunssf, int16): engineering value = raw * 10^SF. Not applied automatically by this tool; read the matching _SF point."
+  },
+  {
+   "name": "Operating State (St)",
+   "address": 40108,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "enum": {
+    "1": "OFF",
+    "2": "SLEEPING",
+    "3": "STARTING",
+    "4": "MPPT",
+    "5": "THROTTLED",
+    "6": "SHUTTING_DOWN",
+    "7": "FAULT",
+    "8": "STANDBY"
+   },
+   "sim": 4
+  },
+  {
+   "name": "Vendor Operating State (StVnd)",
+   "address": 40109,
+   "fc": 3,
+   "type": "uint16",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Vendor-defined enumeration."
+  },
+  {
+   "name": "Event Bitfield 1 (Evt1)",
+   "address": 40110,
+   "fc": 3,
+   "type": "uint32",
+   "access": "r",
+   "group": "status",
+   "sim": 0,
+   "note": "Bits: 0 GROUND_FAULT, 1 DC_OVER_VOLT, 2 AC_DISCONNECT, 3 DC_DISCONNECT, 4 GRID_DISCONNECT, 5 CABINET_OPEN, 6 MANUAL_SHUTDOWN, 7 OVER_TEMP, 8 OVER_FREQUENCY, 9 UNDER_FREQUENCY, 10 AC_OVER_VOLT, 11 AC_UNDER_VOLT, 12 BLOWN_STRING_FUSE, 13 UNDER_TEMP, 14 MEMORY_LOSS, 15 HW_TEST_FAILURE."
+  }
+ ]
+}
