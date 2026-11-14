@@ -106,6 +106,9 @@ The two downloads above ([Releases](https://github.com/tomored88/mbtool-modbus/r
 - Installed copy: settings, edited presets, logs and the MCP audit log live in `%APPDATA%\mbtool`
   (Help > Open data folder). The bundled preset library is refreshed on each new version; your own files are kept.
 - Unexpected errors are written to `logs\crash.log` and shown in a dialog instead of vanishing.
+- **Updates:** Help > Check for updates... (and, once a day at start-up, automatically - switch it off in the Help
+  menu) tells you when a newer release exists and opens its download. Install it over the old version; settings,
+  devices and presets are kept.
 - Build both yourself: `packaging\build_exe.bat` (needs `pip install pyinstaller pillow`); output in `dist\`. The exe is unsigned, so Windows
   SmartScreen may warn on first run ("More info" > "Run anyway").
 

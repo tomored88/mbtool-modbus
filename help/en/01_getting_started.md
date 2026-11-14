@@ -10,6 +10,8 @@ Steps for reading values from a device for the first time:
 
 If the values do not match the device's display, see [[trouble-values-wrong]]
 
+Is there a newer version? See [[updates]]
+
 ## Connecting over TCP (Modbus/TCP)
 <!-- id: connect-tcp | category: Getting started | keywords: tcp ip host port 502 ethernet network gateway -->
 Use this for devices with a network port, or for a gateway that converts RS-485 to Ethernet.
@@ -59,3 +61,19 @@ Use this for RS-485/RS-232 through a USB converter.
 | Ctrl+T / Ctrl+W | Open a new poll tab / close the active poll tab [[poll-tabs]] |
 | Ctrl+Tab, Ctrl+PgUp / Ctrl+PgDn | Switch poll tabs (double-click a tab name = rename, middle-click = close) |
 | Esc | Close most dialogs / cancel editing / clear the search box |
+
+## Updating the program (Check for updates)
+<!-- id: updates | category: Getting started | keywords: update new version check for updates release download install over portable github upgrade -->
+**Help > Check for updates...** asks the Releases page on GitHub whether a newer mbtool than yours exists.
+
+- **A newer version exists:** a window shows its number, release date and what changed. **Download installer** (or **Download portable zip** when you run the portable copy) opens the download in your browser, **Release page** opens the release, **Skip this version** stops the start-up reminder for this version, **Later** closes the window.
+- **You have the latest version:** it says you are up to date.
+- **Check at start-up:** tick **Help > Check for updates when mbtool starts** (on by default). The program then checks by itself at most once a day; without internet it says nothing and does not slow down.
+
+**Installing the new version:**
+- Installer: run the downloaded `mbtool-setup.exe` and install into the same folder; no need to uninstall first.
+- Portable: unzip the new zip and move your `data` folder next to the new `mbtool.exe`.
+
+Your settings, devices, workspaces and edited presets are kept; the bundled preset library is refreshed automatically.
+
+Nothing is downloaded or installed automatically. The check is one read of GitHub's public release information (it only sends the program's name and version), nothing else about you. CLI: `mbtool-cli.exe update-check` (or `python src/mbtool.py update-check`)

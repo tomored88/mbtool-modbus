@@ -27,7 +27,7 @@ with open(version_file, "w", encoding="utf-8") as f:
 
 datas = [(os.path.join(root, "help"), "help"), (os.path.join(root, "presets"), "presets"), (os.path.join(src, "mbtool.ico"), ".")]
 hidden = ["mbtool_mcp", "scanner", "testcenter", "interpret", "ai_report", "datalog", "monitor", "preset",
-          "helpdocs", "appinfo", "signals", "buscalc", "busmap", "bushealth", "commission", "export", "demo", "selftest", "setup_app", "winreg", "serial.tools.list_ports",
+          "helpdocs", "appinfo", "signals", "buscalc", "busmap", "bushealth", "commission", "export", "updates", "demo", "selftest", "setup_app", "winreg", "serial.tools.list_ports",
           # pyserial loads URL handlers (socket:// for the emulated line / vcom, loop://, rfc2217://) by name at run time
           "serial.urlhandler.protocol_socket", "serial.urlhandler.protocol_loop", "serial.urlhandler.protocol_rfc2217",
           "serial.urlhandler.protocol_hwgrep", "serial.urlhandler.protocol_spy", "serial.urlhandler.protocol_alt"]

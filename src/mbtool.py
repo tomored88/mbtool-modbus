@@ -286,6 +286,7 @@ DEFAULTS = {
     "export": {"mqtt": {"on": False, "host": "", "port": "1883", "tls": False, "user": "", "client_id": "",
                         "prefix": "mbtool", "style": "json", "retain": False, "min_interval_s": "0"},
                "sqlite": {"on": False, "path": ""}},  # Tools > Data export (the MQTT password is never saved)
+    "updates": {"auto": True, "last_check": 0.0, "skip": ""},  # Help > Check for updates (GitHub releases)
     "report": {"project": "", "site": "", "customer": "", "engineer": "", "notes": "", "lang": "en", "pdf": True,
                "folder": ""},  # File > Commissioning report: the form is remembered
     "tabs": {"main_name": "Poll 1", "active": 0},  # poll tabs of the main window: first tab's title, selected tab
@@ -2568,6 +2569,11 @@ class MasterApp:
         hm.add_command(label="Workspaces", command=lambda: self.open_help(key="workspace"))
         hm.add_command(label="Exception codes", command=lambda: self.open_help(key="error.exception"))
         hm.add_separator()
+        hm.add_command(label="Check for updates...", command=lambda: self.check_updates(manual=True))
+        self.upd_auto_var = tk.BooleanVar(value=bool(self.cfg["updates"].get("auto", True)))
+        hm.add_checkbutton(label="Check for updates when mbtool starts", variable=self.upd_auto_var,
+                           command=lambda: self.set_update_auto(self.upd_auto_var.get()))
+        hm.add_separator()
         hm.add_command(label="Open data folder", command=self.open_data_folder)
         hm.add_command(label="About mbtool...", command=self.show_about)
         mb.add_cascade(label="Help", menu=hm)
@@ -3304,6 +3310,63 @@ class MasterApp:
                 pass
         self.open_help(key=widget_help_key(w) if w is not None else None)
         return "break"
+
+    # ---------- updates ----------
+    def set_update_auto(self, on):
+        self.cfg["updates"]["auto"] = bool(on)
+        if hasattr(self, "upd_auto_var") and self.upd_auto_var.get() != bool(on):
+            self.upd_auto_var.set(bool(on))
+        save_settings(self.cfg)
+
+    def auto_check_updates(self, now=None):
+        """At start: check GitHub at most once a day, silently; only a newer, not skipped version shows a dialog.
+        Returns True when a check was started."""
+        u = self.cfg["updates"]
+        now = time.time() if now is None else now
+        try:
+            last = float(u.get("last_check") or 0)
+        except (TypeError, ValueError):
+            last = 0.0
+        if not u.get("auto", True) or now - last < updates_mod().CHECK_EVERY_S:
+            return False
+        self.check_updates(manual=False)
+        return True
+
+    def check_updates(self, manual=True):
+        """Ask GitHub for the latest release on a worker thread; the result comes back through the app queue."""
+        upd = updates_mod()
+        if manual:
+            self._status("Checking for updates...", "info")
+
+        def work():
+            try:
+                r = upd.check()
+                self.q.put(("call", None, lambda res, err: self._updates_done(res, err, manual), r, None))
+            except Exception as e:  # noqa: BLE001 - reported (manual) or ignored (automatic)
+                self.q.put(("call", None, lambda res, err: self._updates_done(res, err, manual), None,
+                            str(e) or repr(e)))
+        threading.Thread(target=work, daemon=True).start()
+
+    def _updates_done(self, res, err, manual):
+        from tkinter import messagebox
+        u = self.cfg["updates"]
+        if err:
+            if manual:
+                self._status(f"Could not check for updates: {err}", "bad")
+                messagebox.showwarning("Check for updates", f"Could not check for updates:\n{err}\n\n"
+                                       f"You can look yourself: {updates_mod().RELEASES_URL}", parent=self.root)
+            return None
+        u["last_check"] = time.time()
+        save_settings(self.cfg)
+        if res["newer"] and (manual or u.get("skip") != res["latest"]):
+            self._status(f"mbtool {res['latest']} is available (you have {res['current']})", "warn")
+            self.update_dlg = UpdateDialog(self, res)
+            return self.update_dlg
+        if manual:
+            self._status(f"mbtool {res['current']} is up to date", "ok")
+            messagebox.showinfo("Check for updates", f"mbtool {res['current']} is up to date.\n"
+                                f"(latest release: {res['latest']})", parent=self.root)
+        return None
 
     def open_data_folder(self):
         try:
@@ -7290,6 +7353,68 @@ class ExportWindow:
                                        f"{err}") if err else "")
         if not once:
             self.job = self.w.after(1000, self._tick)
+
+
+def updates_mod():
+    import updates
+    return updates
+
+
+class UpdateDialog(Dialog):
+    """A newer release exists: what is new, download link (opened in the browser), skip this version, later."""
+
+    def __init__(self, app, res):
+        super().__init__(app, "Update available")
+        self.res = res
+        s = app.s
+        b = self.body
+        ttk.Label(b, text=f"mbtool {res['latest']} is available", style="Conn.TLabel").pack(anchor="w")
+        pub = f", released {res['published']}" if res.get("published") else ""
+        ttk.Label(b, text=f"You have {res['current']}{pub}. Your settings, devices and presets are kept when you "
+                          "install the new version over this one.", style="Info.TLabel",
+                  wraplength=int(520 * s), justify="left").pack(anchor="w", pady=(2, 6))
+        notes = tk.Text(b, width=72, height=12, wrap="word", font=("Segoe UI", 9), relief="flat", bg=COL["alt"])
+        notes.insert("1.0", res.get("notes") or "(no release notes)")
+        notes.configure(state="disabled")
+        notes.pack(fill="both", expand=True)
+        self.portable = appinfo.PORTABLE
+        self.url = (res.get("portable_url") if self.portable else res.get("setup_url")) or res.get("page")
+        how = ("Portable: unzip the new zip and copy your data folder next to the new mbtool.exe."
+               if self.portable else "Run the downloaded mbtool-setup.exe and install into the same folder.")
+        ttk.Label(b, text=how, style="Info.TLabel", wraplength=int(520 * s), justify="left").pack(anchor="w", pady=(6, 0))
+        self.auto = tk.BooleanVar(value=bool(app.cfg["updates"].get("auto", True)))
+        ttk.Checkbutton(b, text="Check for updates when mbtool starts", variable=self.auto,
+                        command=lambda: app.set_update_auto(self.auto.get())).pack(anchor="w", pady=(6, 0))
+        bf = ttk.Frame(b)
+        bf.pack(fill="x", pady=(10, 0))
+        ttk.Button(bf, text="Later", command=self.close).pack(side="right")
+        ttk.Button(bf, text="Skip this version", command=self.skip).pack(side="right", padx=(0, 6))
+        ttk.Button(bf, text="Release page", command=lambda: self._open(res.get("page"))).pack(side="right", padx=(0, 6))
+        self.b_dl = ttk.Button(bf, text="Download portable zip" if self.portable else "Download installer",
+                               command=self.download, default="active")
+        self.b_dl.pack(side="right", padx=(0, 6))
+        self.w.bind("<Return>", lambda e: self.download())
+        self.opened = None
+        self.place()
+
+    def _open(self, url):
+        import webbrowser
+        if url:
+            self.opened = url
+            webbrowser.open(url)
+        return url
+
+    def download(self):
+        url = self._open(self.url)
+        self.app._status("Download started in your browser - install it when it has finished", "info")
+        self.close()
+        return url
+
+    def skip(self):
+        self.app.cfg["updates"]["skip"] = self.res["latest"]
+        save_settings(self.app.cfg)
+        self.app._status(f"Version {self.res['latest']} skipped - Help > Check for updates still shows it", "info")
+        self.close()
 
 
 class ReportDialog(Dialog):
@@ -14286,11 +14411,12 @@ def gui(workspace=None):
     appinfo.seed_presets()
     try:
         ico = appinfo.icon_path()
-        if os.path.isfile(ico):
+        if ico and os.path.isfile(ico):
             root.iconbitmap(ico)
     except tk.TclError:
         pass
     app = MasterApp(root)
+    root.after(4000, app.auto_check_updates)  # once a day at most, silent unless a newer version exists
     recent = app.cfg["workspace"].get("recent") or []
     path = workspace or (recent[0] if app.cfg["workspace"].get("autoload") and recent else None)
     if path:
@@ -14352,6 +14478,7 @@ def main():
     s = sub.add_parser("mcp", help="run the MCP server (stdio, or --http); same options as mbtool_mcp.py")
     s.add_argument("rest", nargs=argparse.REMAINDER)
     s.set_defaults(fn=lambda a: __import__("mbtool_mcp").main(a.rest))
+    sub.add_parser("update-check", help="check GitHub for a newer mbtool release (Help > Check for updates)")
     s = sub.add_parser("health", help="bus health test: real response times, errors by kind, recommended timeout "
                                       "and gap (same options as bushealth.py, e.g. --com COM3 --baud 19200 --units 1-5)")
     s.add_argument("rest", nargs=argparse.REMAINDER)
@@ -14360,6 +14487,8 @@ def main():
     s.set_defaults(fn=lambda a: sys.exit(__import__("selftest").main()))
     p.add_argument("--version", action="version", version=f"mbtool {appinfo.VERSION}")
     p.add_argument("--workspace", help="GUI: open this workspace (.mbw) at start")
+    if sys.argv[1:2] == ["update-check"]:  # is a newer release on GitHub? (prints the answer)
+        sys.exit(__import__("updates").main(sys.argv[2:]))
     if sys.argv[1:2] == ["health"]:  # its own options start with "--": hand them over untouched
         sys.exit(__import__("bushealth").main(sys.argv[2:]))
     if "--uninstall" in sys.argv[1:]:  # Apps & features calls: mbtool.exe --uninstall

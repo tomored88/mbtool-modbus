@@ -120,7 +120,7 @@ def main(argv=None):
     def _modules():
         import buscalc
         import busmap
-        for name in ("mbtool_mcp", "scanner", "signals", "bushealth", "commission", "export",
+        for name in ("mbtool_mcp", "scanner", "signals", "bushealth", "commission", "export", "updates",
                      "serial.urlhandler.protocol_socket"):
             __import__(name)
         est = buscalc.estimate_cycle(buscalc.Link("rtu", 19200), [{"name": "a", "unit": 1, "requests": [(3, 10)]}])

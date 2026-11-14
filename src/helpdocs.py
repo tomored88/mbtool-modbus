@@ -199,7 +199,7 @@ CONTEXT_TOPICS = {
     "setup.timeout": "values-fields", "setup.parity": "serial-settings", "setup.stop": "serial-settings", "setup.mode": "rtu-vs-ascii",
     "write": "write-dialog", "inspector": "inspector", "traffic": "traffic-monitor", "preset": "preset-view",
     "preset.editor": "preset-editor", "trend": "trend", "alerts": "alerts", "devices": "devices",
-    "devices.tabs": "devices-tabs", "devices.scan": "devices-tabs", "devices.cycle": "plc-cycle", "devices.health": "bus-health", "report": "commission-report", "export": "data-export",
+    "devices.tabs": "devices-tabs", "devices.scan": "devices-tabs", "devices.cycle": "plc-cycle", "devices.health": "bus-health", "report": "commission-report", "export": "data-export", "updates": "updates",
     "bus.map": "bus-map",
     "log": "logging", "workspace": "workspace", "slavesim": "slave-sim", "slavesim.faults": "sim-faults", "ai": "ai-assist",
     "error.timeout": "trouble-no-response", "error.crc": "trouble-crc", "error.exception": "exceptions",
