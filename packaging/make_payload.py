@@ -2,7 +2,7 @@
 import os
 import zipfile
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
 SRC = os.path.join(HERE, "dist", "mbtool")
 OUT = os.path.join(HERE, "build", "payload.zip")
 

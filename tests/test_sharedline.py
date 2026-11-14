@@ -2,7 +2,7 @@
 answers; it must cut frames at their protocol length so an answer glued to the next request is not mistaken for one
 long broken frame (that made every second request time out when the gap was under ~40 ms)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import unittest
 
 import load_bus

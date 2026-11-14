@@ -2,7 +2,7 @@
 Slave ID (SimSlave(unit=None)). Scans a range, ticks only some rows, checks tabs appear / update / disappear,
 a rescan never duplicates, workspace round trip and that closing the window leaves no after() jobs behind."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import json
 import os
 import tempfile

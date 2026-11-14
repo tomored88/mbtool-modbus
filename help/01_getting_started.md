@@ -6,7 +6,7 @@
 2. กด **F5** หรือปุ่ม Connect โปรแกรมจะเริ่ม poll ตามค่าในแผง Poll
 3. ในแผง Poll ตั้ง **Slave ID**, **Function**, **Address**, **Quantity**, **Scan Rate** และ **Display** (ดู [[poll-panel]])
 4. ดูผลในตาราง ค่าที่เปลี่ยนจะกะพริบสีเหลือง แถบสถานะด้านล่างแสดงจำนวนครั้งที่สำเร็จ/ผิดพลาด
-5. ถ้าไม่มีอุปกรณ์ ให้ลองกับ simulator: กด **F9** (Slave Sim) หรือรัน `python mbtool.py sim --port 5020`
+5. ถ้าไม่มีอุปกรณ์ ให้ลองกับ simulator: กด **F9** (Slave Sim) หรือรัน `python src/mbtool.py sim --port 5020`
 
 ถ้าค่าที่ได้ไม่ตรงกับหน้าจอเครื่อง ดู [[trouble-values-wrong]]
 
@@ -34,8 +34,8 @@ TCP ไม่มี CRC เพราะ TCP ตรวจความถูกต
 ## ทดสอบโดยไม่มีอุปกรณ์ (Simulator และสายจำลอง)
 <!-- id: vcom | category: เริ่มต้นใช้งาน | keywords: simulator จำลอง vcom null modem ทดสอบ socket slave sim -->
 - **Slave Sim (F9):** เปิด slave จำลองใน GUI แก้ค่าในตารางได้ เลือก TCP, RTU หรือ ASCII
-- **ใน CLI:** `python mbtool.py sim --port 5020 --preset presets/example_generic_meter.json` ให้ simulator ตอบตามค่า `sim` ของ preset เพิ่ม `--signals profile` ให้ค่าขยับเหมือนอุปกรณ์จริง ([[sim-signals]])
-- **สายจำลอง (vcom):** `python mbtool.py vcom --port 7000` สร้าง null-modem ผ่าน TCP โดยไม่ต้องติดตั้งไดรเวอร์ ใส่ `socket://127.0.0.1:7000` ในช่อง COM ทั้งฝั่ง master และ slave
+- **ใน CLI:** `python src/mbtool.py sim --port 5020 --preset presets/example_generic_meter.json` ให้ simulator ตอบตามค่า `sim` ของ preset เพิ่ม `--signals profile` ให้ค่าขยับเหมือนอุปกรณ์จริง ([[sim-signals]])
+- **สายจำลอง (vcom):** `python src/mbtool.py vcom --port 7000` สร้าง null-modem ผ่าน TCP โดยไม่ต้องติดตั้งไดรเวอร์ ใส่ `socket://127.0.0.1:7000` ในช่อง COM ทั้งฝั่ง master และ slave
 - **ข้อจำกัด:** สายจำลองไม่บังคับค่า baud/parity จึงทดสอบการเฟรม RTU ได้ แต่ทดสอบการตั้งค่าผิดไม่ได้
 
 ## ปุ่มลัดทั้งหมด

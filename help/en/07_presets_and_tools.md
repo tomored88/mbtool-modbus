@@ -51,7 +51,7 @@ Checks that a slave follows the Modbus rules: reads all 4 areas, returns the cor
 
 Results are PASS / FAIL / WARN / SKIP. **The default mode is read-only**, safe for real devices. Write tests (FC05/06/15/16/22/23) must be enabled explicitly (`--write --scratch <address>`) and restore the original value afterwards.
 
-`python testcenter.py tcp://host:502 -u 1 --addr 0`
+`python src/testcenter.py tcp://host:502 -u 1 --addr 0`
 
 ## Creating a preset from a new manual
 <!-- id: preset-howto | category: Presets and tools | keywords: create, new preset, csv, excel, import, register map, manual, how to -->
@@ -65,14 +65,14 @@ Results are PASS / FAIL / WARN / SKIP. **The default mode is read-only**, safe f
 `mbtool_mcp.py` is an MCP server that any MCP-capable AI can call: connect, read values, summarize repeated values, view traffic, scan, identify a device, interpret registers, diagnostic report, Test Center, read by preset, and search this manual.
 
 - **stdio:** the client program launches it itself. Register it with a `.mcp.json` file (example in `.mcp.json.example`).
-- **HTTP:** `python mbtool_mcp.py --http` shares it with someone else's AI. A token is required; see [[mcp-security]].
+- **HTTP:** `python src/mbtool_mcp.py --http` shares it with someone else's AI. A token is required; see [[mcp-security]].
 - **Writing is off by default.** Enable it with `MBTOOL_ALLOW_WRITE=1` and specify ranges in `MBTOOL_WRITE_ALLOW`, e.g. `1:3:100-110;1:0:0-7` (Slave:area:range; area 3 = holding, 0 = coil).
 
 Main tools: `status`, `connect`, `read`, `snapshot`, `get_traffic`, `sim_start`, `sim_load_preset` (simulated values move according to the preset, see [[sim-signals]]), `scan_serial_settings`, `scan_unit_ids`, `scan_register_map`, `identify_device`, `interpret_registers`, `diagnostic_report`, `test_center`, `list_presets`, `preset_read`, `search_help`, `get_help`
 
 ## Self test
 <!-- id: selftest | category: Presets and tools | keywords: selftest, self test, check, test, program, install, exe, works, pass, fail -->
-The command `mbtool-cli.exe selftest` (installer/portable) or `python mbtool.py selftest` checks that the program works completely on this machine, with no real device needed, and prints PASS / FAIL for each item:
+The command `mbtool-cli.exe selftest` (installer/portable) or `python src/mbtool.py selftest` checks that the program works completely on this machine, with no real device needed, and prints PASS / FAIL for each item:
 
 - every preset in the library opens
 - TCP read/write against the simulator, RTU over a simulated line with 3 slaves, and reconnecting after a TCP drop
@@ -96,14 +96,14 @@ URL format: `tcp://host:502` or `serial:COM3?baud=19200&parity=E&stop=1&mode=rtu
 
 | Command | What it does |
 |---|---|
-| `python mbtool.py` | Open the GUI |
-| `python mbtool.py read URL -u 1 -f 3 -a 0 -n 10 [--fmt Float] [--scan 1000] [--log out.csv]` | Read values |
-| `python mbtool.py write URL -u 1 -f 16 -a 50 --fmt Float 3.14` | Write a value |
-| `python mbtool.py sim --port 5020 [--preset f.json] [--signals profile --device-type drive --speed 2] [--serial COM4 --mode rtu]` | Simulated slave, values move according to the mode ([[sim-signals]]) |
-| `python mbtool.py vcom --port 7000` | Virtual null-modem line |
-| `python mbtool.py preset-list / preset-read / preset-write` | Work with presets |
-| `python scanner.py serial COM3` | Scan connection settings ([[scanner]]) |
-| `python testcenter.py URL` | Check a slave ([[testcenter]]) |
-| `python interpret.py --words 0x4348 0xCCCD` | Interpret registers ([[inspector]]) |
-| `python helpdocs.py search word` | Search this manual |
-| `mbtool-cli.exe selftest` (or `python mbtool.py selftest`) | Check the program on this machine without any device ([[selftest]]) |
+| `python src/mbtool.py` | Open the GUI |
+| `python src/mbtool.py read URL -u 1 -f 3 -a 0 -n 10 [--fmt Float] [--scan 1000] [--log out.csv]` | Read values |
+| `python src/mbtool.py write URL -u 1 -f 16 -a 50 --fmt Float 3.14` | Write a value |
+| `python src/mbtool.py sim --port 5020 [--preset f.json] [--signals profile --device-type drive --speed 2] [--serial COM4 --mode rtu]` | Simulated slave, values move according to the mode ([[sim-signals]]) |
+| `python src/mbtool.py vcom --port 7000` | Virtual null-modem line |
+| `python src/mbtool.py preset-list / preset-read / preset-write` | Work with presets |
+| `python src/scanner.py serial COM3` | Scan connection settings ([[scanner]]) |
+| `python src/testcenter.py URL` | Check a slave ([[testcenter]]) |
+| `python src/interpret.py --words 0x4348 0xCCCD` | Interpret registers ([[inspector]]) |
+| `python src/helpdocs.py search word` | Search this manual |
+| `mbtool-cli.exe selftest` (or `python src/mbtool.py selftest`) | Check the program on this machine without any device ([[selftest]]) |

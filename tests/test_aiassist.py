@@ -1,7 +1,7 @@
 """AI Assist (GUI feature) helpers in monitor.py: sharing options, snippets, audit lines, report prompt and the
 read-only master wrapper that the GUI hands to the in-process MCP server."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import asyncio
 import json
 import os

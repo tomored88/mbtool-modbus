@@ -1,7 +1,7 @@
 """Slave Simulator (F9) Signals tab, driven in-process: preset load, moving values over TCP, modes, pause,
 pattern override, settings and engine shutdown on close."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import socket
 import tempfile

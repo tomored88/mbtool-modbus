@@ -7,7 +7,7 @@ where py >nul 2>nul && (set PY=py -3) || (set PY=python)
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt || goto :fail
 echo.
 echo Done. Start the program with run.bat
-echo Optional check:  .venv\Scripts\python.exe tests	est_core.py
+echo Optional check:  .venv\Scripts\python.exe src\mbtool.py selftest
 pause
 exit /b 0
 :fail

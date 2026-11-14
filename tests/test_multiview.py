@@ -1,7 +1,7 @@
 """Multi-type view: the pure helper (monitor.multi_rows / multi_encode) and the main window driven in-process
 against a SimSlave (toggle, columns persisted, editing a cell writes the right registers)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import json
 import os
 import struct

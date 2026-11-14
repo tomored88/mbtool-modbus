@@ -2,7 +2,7 @@
 answers, and work again as soon as the line is good. Covers TCP and RTU masters, a random mix, the GUI's main poll
 and a shared RS-485 bus where one device is broken."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import tempfile
 import time

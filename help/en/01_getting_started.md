@@ -6,7 +6,7 @@ Steps for reading values from a device for the first time:
 2. Press **F5** or the Connect button. The program starts polling using the values in the Poll panel
 3. In the Poll panel set **Slave ID**, **Function**, **Address**, **Quantity**, **Scan Rate** and **Display** (see [[poll-panel]])
 4. Check the results in the table. Values that change flash yellow. The status bar at the bottom shows the number of successful/failed requests
-5. If you have no device, try the simulator: press **F9** (Slave Sim) or run `python mbtool.py sim --port 5020`
+5. If you have no device, try the simulator: press **F9** (Slave Sim) or run `python src/mbtool.py sim --port 5020`
 
 If the values do not match the device's display, see [[trouble-values-wrong]]
 
@@ -34,8 +34,8 @@ Use this for RS-485/RS-232 through a USB converter.
 ## Testing without a device (Simulator and virtual cable)
 <!-- id: vcom | category: Getting started | keywords: simulator vcom null modem test socket slave sim -->
 - **Slave Sim (F9):** opens a simulated slave in the GUI. You can edit values in the table. Choose TCP, RTU or ASCII
-- **In the CLI:** `python mbtool.py sim --port 5020 --preset presets/example_generic_meter.json` makes the simulator respond according to the preset's `sim` values. Add `--signals profile` to make values move like a real device ([[sim-signals]])
-- **Virtual cable (vcom):** `python mbtool.py vcom --port 7000` creates a null-modem over TCP with no driver installation. Enter `socket://127.0.0.1:7000` in the COM field on both the master and the slave side
+- **In the CLI:** `python src/mbtool.py sim --port 5020 --preset presets/example_generic_meter.json` makes the simulator respond according to the preset's `sim` values. Add `--signals profile` to make values move like a real device ([[sim-signals]])
+- **Virtual cable (vcom):** `python src/mbtool.py vcom --port 7000` creates a null-modem over TCP with no driver installation. Enter `socket://127.0.0.1:7000` in the COM field on both the master and the slave side
 - **Limitation:** the virtual cable does not enforce baud/parity, so it can test RTU framing but cannot test wrong-settings scenarios
 
 ## All keyboard shortcuts

@@ -14285,7 +14285,7 @@ def gui(workspace=None):
     appinfo.install_crash_handlers(root)
     appinfo.seed_presets()
     try:
-        ico = os.path.join(appinfo.resource_dir(), "mbtool.ico")
+        ico = appinfo.icon_path()
         if os.path.isfile(ico):
             root.iconbitmap(ico)
     except tk.TclError:

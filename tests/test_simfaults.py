@@ -1,7 +1,7 @@
 """Slave Sim > Faults tab: rates go live onto the store (TCP and the shared store), counters, quick presets, the
 master sees the matching error type. Driven in-process (no clicks)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import socket
 import tempfile

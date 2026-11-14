@@ -25,5 +25,5 @@ def draw(n):
 
 if __name__ == "__main__":
     big = draw(256)
-    big.save("mbtool.ico", sizes=[(s, s) for s in SIZES])
+    big.save(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "mbtool.ico"), sizes=[(s, s) for s in SIZES])
     print("mbtool.ico written")

@@ -66,9 +66,9 @@ baud สูงต้องใช้สายสั้นลง: ใส่คว�
 <!-- id: scanner | category: Serial และโปรโตคอล | keywords: scan สแกน auto ค้นหา baud parity slave id ค้นอุปกรณ์ identify register range -->
 `scanner.py` (และเครื่องมือ MCP ที่ตรงกัน) ลองค่าเชื่อมต่อให้ ทุกอย่างเป็นการอ่านอย่างเดียว
 
-- `python scanner.py serial COM3 --units 1-10,247` ลอง baud × parity × stop bits × Slave ID โดยเรียงค่าที่พบบ่อยก่อน แจ้งค่าที่ถูก และ "noise" (ค่าที่ได้ข้อมูลแต่ถอดรหัสไม่ได้ แปลว่าใกล้ถูกแล้ว)
-- `python scanner.py ids URL` Slave ID ใดตอบบ้าง
-- `python scanner.py regs URL -u 1 --start 0 --end 999` ช่วง register ที่อ่านได้ แบ่งครึ่งหาขอบเขตแน่นอน
-- `python scanner.py identify URL -u 1` ถามรุ่นอุปกรณ์ (FC43/14, FC17) และแนะนำ preset
+- `python src/scanner.py serial COM3 --units 1-10,247` ลอง baud × parity × stop bits × Slave ID โดยเรียงค่าที่พบบ่อยก่อน แจ้งค่าที่ถูก และ "noise" (ค่าที่ได้ข้อมูลแต่ถอดรหัสไม่ได้ แปลว่าใกล้ถูกแล้ว)
+- `python src/scanner.py ids URL` Slave ID ใดตอบบ้าง
+- `python src/scanner.py regs URL -u 1 --start 0 --end 999` ช่วง register ที่อ่านได้ แบ่งครึ่งหาขอบเขตแน่นอน
+- `python src/scanner.py identify URL -u 1` ถามรุ่นอุปกรณ์ (FC43/14, FC17) และแนะนำ preset
 
 ข้อจำกัด: ทดสอบกับตัวจำลองเท่านั้น พฤติกรรมของอุปกรณ์จริงเมื่อตั้ง baud ผิดอาจต่างกัน การสแกนนานขึ้นเมื่อลอง Slave ID เยอะ

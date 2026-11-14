@@ -3,7 +3,7 @@
     "modbus": {
       "type": "stdio",
       "command": "C:\path\to\mbtool\.venv\Scripts\python.exe",
-      "args": ["C:\path\to\mbtool\mbtool_mcp.py"],
+      "args": ["C:\path\to\mbtool\src\mbtool_mcp.py"],
       "env": {}
     }
   }

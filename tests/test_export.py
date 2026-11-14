@@ -1,7 +1,7 @@
 """export.py: MQTT 3.1.1 publish client against a small local broker stand-in (real protocol bytes on a socket),
 both payload styles, broker outage with backlog, auth refusal, SQLite rows."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import json
 import os
 import socket

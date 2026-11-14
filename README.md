@@ -1,6 +1,37 @@
-# mbtool - Modbus master, slave simulator and MCP server
+# mbtool - Modbus master, slave simulator and RS-485 bus design tool
 
-A Modbus master, slave simulator and RS-485 bus design tool, written from the public Modbus specification (no code taken from any commercial product).
+Read, write, simulate and analyse Modbus devices (TCP / RTU / ASCII) and design the RS-485 bus - one Windows program,
+with an MCP server so AI assistants can help. Free and open source (MIT).
+
+## ⬇ Download (Windows 10 / 11)
+
+**Just want to use it? Download one file - you do not need anything else in this repository.**
+
+| I want to... | Download |
+|---|---|
+| **Install it** (Start menu shortcut, uninstall from Apps & features, no admin rights) | [**mbtool-setup.exe**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-setup.exe) |
+| **Run it without installing** (unzip anywhere, e.g. a USB stick) | [**mbtool-portable.zip**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-portable.zip) |
+
+All versions and release notes: [Releases](https://github.com/tomored88/mbtool-modbus/releases/latest). The program is not code-signed, so Windows SmartScreen may warn
+the first time: **More info > Run anyway**. After installing, `mbtool-cli.exe selftest` checks it on your PC in about
+15 seconds, no hardware needed.
+
+Feature sheet: [English](docs/feature-sheet-en.pdf) · [ไทย](docs/feature-sheet-th.pdf) &nbsp;|&nbsp;
+Manual: built in (press **F1**, Thai and English)
+
+## What is in this repository
+
+| Folder / file | Contents |
+|---|---|
+| `src/` | the program (Python): `mbtool.py` is the main program, the other files are its modules |
+| `help/` | the built-in manual (Thai in `help/`, English in `help/en/`) |
+| `presets/` | device register maps (JSON) - the library of 30 models is UNVERIFIED |
+| `docs/` | feature sheets and sample commissioning reports |
+| `tests/` | automated tests (`python -m pytest tests`) |
+| `packaging/` | build scripts for the .exe, installer and portable zip (`packaging\build_exe.bat`) |
+| `run.bat`, `install.bat` | run from source with Python (developers) |
+
+## Features
 
 - **Master:** Modbus/TCP, RTU, ASCII; function codes 01-06, 15, 16, 22, 23; 10 display formats.
 - **GUI** (tkinter): poll tabs (several polls open at once in the main window, like several poll windows: own
@@ -12,7 +43,7 @@ A Modbus master, slave simulator and RS-485 bus design tool, written from the pu
 - **Bus map** (Tools > Bus map, Ctrl+M): draw where each device sits on the RS-485 line (order, cable and stub lengths,
   terminators, bias); it estimates propagation delay, recommended max baud, critical length, unit loads and voltage drop,
   lists wiring warnings, and animates a request / response travelling along the line (or follows the real traffic).
-  The program cannot see the wiring - the numbers are only as good as the map you enter. CLI: `python mbtool.py busmap map.json`.
+  The program cannot see the wiring - the numbers are only as good as the map you enter. CLI: `python src/mbtool.py busmap map.json`.
 - **Presets:** JSON register maps per device (`presets/`, 30 library files for meters, drives, inverters, sensors,
   I/O, level / pressure / flow). **Every library preset is UNVERIFIED** - they were written from public manuals and
   never tested on a real device. Compare the values with the device display before trusting them.
@@ -21,13 +52,13 @@ A Modbus master, slave simulator and RS-485 bus design tool, written from the pu
 - **Scanner:** serial settings (baud/parity/stop/Slave ID), Slave IDs, readable register ranges, device
   identification (FC43/14, FC17) with preset suggestions. Read-only.
 - **Test Center:** checks a slave against Modbus rules (exception codes, limits, timing); optional write tests.
-- **Built-in manual** (F1, Thai): 80 searchable topics - function codes, exception codes, data types, address bases, serial settings, every GUI feature, preset fields, troubleshooting, glossary - with context help on each control. CLI: `python helpdocs.py search "exception 2"`.
+- **Built-in manual** (F1, Thai and English): 85 searchable topics - function codes, exception codes, data types, address bases, serial settings, every GUI feature, preset fields, troubleshooting, glossary - with context help on each control. CLI: `python src/helpdocs.py search "exception 2"`.
 - **MCP server** (`mbtool_mcp.py`): lets an AI read devices, take snapshots, scan and test. **Writes are disabled
   unless you enable them** (see below).
 
-## Windows app (no Python needed)
+## Windows app details
 
-Two downloads in `dist\`:
+The two downloads above ([Releases](https://github.com/tomored88/mbtool-modbus/releases/latest)):
 
 - **`mbtool-setup.exe`** - GUI installer: pick the install folder, shortcuts, done (per-user, no admin). Scripted:
   `mbtool-setup.exe --silent --dir D:\Tools\mbtool`. Uninstall from Apps & features.
@@ -40,33 +71,33 @@ Two downloads in `dist\`:
 - Installed copy: settings, edited presets, logs and the MCP audit log live in `%APPDATA%\mbtool`
   (Help > Open data folder). The bundled preset library is refreshed on each new version; your own files are kept.
 - Unexpected errors are written to `logs\crash.log` and shown in a dialog instead of vanishing.
-- Build both yourself: `build_exe.bat` (needs `pip install pyinstaller pillow`). The exe is unsigned, so Windows
+- Build both yourself: `packaging\build_exe.bat` (needs `pip install pyinstaller pillow`); output in `dist\`. The exe is unsigned, so Windows
   SmartScreen may warn on first run ("More info" > "Run anyway").
 
-## Install (Windows, Python 3.10+)
+## Run from source (Windows, Python 3.10+)
 
 ```
 install.bat          creates .venv and installs requirements
 run.bat              starts the GUI
 ```
 
-or manually: `pip install -r requirements.txt` then `python mbtool.py`.
+or manually: `pip install -r requirements.txt` then `python src/mbtool.py`.
 Other systems: the code is plain Python; tkinter and pyserial are the only runtime needs for the GUI.
 
 ## Quick try without hardware
 
 ```
-python mbtool.py sim --port 5020 --preset presets/example_generic_meter.json
-python mbtool.py                         # GUI: F3 setup -> TCP 127.0.0.1:5020 -> Connect, F7 for the preset view
-python mbtool.py preset-read tcp://127.0.0.1:5020 presets/example_generic_meter.json
+python src/mbtool.py sim --port 5020 --preset presets/example_generic_meter.json
+python src/mbtool.py                         # GUI: F3 setup -> TCP 127.0.0.1:5020 -> Connect, F7 for the preset view
+python src/mbtool.py preset-read tcp://127.0.0.1:5020 presets/example_generic_meter.json
 ```
 
 RTU without hardware (software cable, the baud rate is not enforced):
 
 ```
-python mbtool.py vcom --port 7000
-python mbtool.py sim --serial socket://127.0.0.1:7000 -u 1 --baud 19200 --parity E
-python mbtool.py read "serial:socket://127.0.0.1:7000?baud=19200&parity=E" -u 1 -f 3 -a 0 -n 5
+python src/mbtool.py vcom --port 7000
+python src/mbtool.py sim --serial socket://127.0.0.1:7000 -u 1 --baud 19200 --parity E
+python src/mbtool.py read "serial:socket://127.0.0.1:7000?baud=19200&parity=E" -u 1 -f 3 -a 0 -n 5
 ```
 
 In the GUI type `socket://127.0.0.1:7000` into the COM port box.
@@ -74,11 +105,11 @@ In the GUI type `socket://127.0.0.1:7000` into the COM port box.
 ## Command line
 
 ```
-python mbtool.py read|write|sim|vcom|preset-list|preset-read|preset-write ...
-python scanner.py serial COM3 --units 1-10,247      find baud / parity / stop bits / Slave ID
-python scanner.py ids URL | regs URL | identify URL
-python testcenter.py tcp://host:502 -u 1 --addr 0   [--write --scratch 200]
-python interpret.py --words 0x4348 0xCCCD           every interpretation of raw registers
+python src/mbtool.py read|write|sim|vcom|preset-list|preset-read|preset-write ...
+python src/scanner.py serial COM3 --units 1-10,247      find baud / parity / stop bits / Slave ID
+python src/scanner.py ids URL | regs URL | identify URL
+python src/testcenter.py tcp://host:502 -u 1 --addr 0   [--write --scratch 200]
+python src/interpret.py --words 0x4348 0xCCCD           every interpretation of raw registers
 ```
 
 URLs: `tcp://host:port` or `serial:COM3?baud=19200&parity=E&stop=1&mode=rtu` (mode `rtu` or `ascii`).
@@ -98,8 +129,8 @@ Besides the per-user stdio mode, the MCP server can be shared over HTTP so that 
 device that is connected to YOUR computer (read-only):
 
 ```
-python mbtool_mcp.py --http --connect tcp://192.168.1.50:502            # this PC only (127.0.0.1:8765)
-python mbtool_mcp.py --http --host 0.0.0.0 --allowed-host mypc.tailnet.ts.net:8765 --connect serial:COM3?baud=9600
+python src/mbtool_mcp.py --http --connect tcp://192.168.1.50:502            # this PC only (127.0.0.1:8765)
+python src/mbtool_mcp.py --http --host 0.0.0.0 --allowed-host mypc.tailnet.ts.net:8765 --connect serial:COM3?baud=9600
 ```
 
 It prints a random bearer token once; give it only to people you trust. Client side (Claude Code example):
@@ -139,13 +170,15 @@ python tests/test_help.py ; python tests/test_aiassist.py ; python tests/test_he
 
 ## สรุปภาษาไทย
 
+**ดาวน์โหลด:** ต้องการติดตั้ง ใช้ [mbtool-setup.exe](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-setup.exe) ถ้าไม่อยากติดตั้ง ใช้ [mbtool-portable.zip](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-portable.zip) แตกไฟล์แล้วรัน `mbtool.exe` ได้เลย ไฟล์อื่นใน repo นี้เป็นโค้ด ไม่ต้องโหลด
+
 เครื่องมือ Modbus: master (TCP/RTU/ASCII), หน้าต่าง GUI, simulator ของ slave, preset ของอุปกรณ์ 30 รุ่น,
 สแกนค่าการเชื่อมต่ออัตโนมัติ, Test Center และ MCP server ให้ AI อ่านค่าอุปกรณ์
 
 - ติดตั้ง: ดับเบิลคลิก `install.bat` แล้วเปิดด้วย `run.bat` (ต้องมี Python 3.10 ขึ้นไป)
 - **preset ทุกไฟล์ยังไม่ผ่านการทดสอบกับอุปกรณ์จริง** ต้องเทียบค่ากับหน้าจอเครื่องก่อนใช้งานจริง
 - MCP ปิดการเขียนค่าเป็นค่าเริ่มต้น เปิดได้ด้วยตัวแปร `MBTOOL_ALLOW_WRITE=1` และระบุช่วง address ที่อนุญาตเท่านั้น
-- ทดสอบ RTU โดยไม่มีฮาร์ดแวร์ได้ด้วย `python mbtool.py vcom` (สายจำลองผ่าน TCP)
+- ทดสอบ RTU โดยไม่มีฮาร์ดแวร์ได้ด้วย `python src/mbtool.py vcom` (สายจำลองผ่าน TCP)
 
 ## License
 

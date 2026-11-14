@@ -1,5 +1,5 @@
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import re
 import subprocess
@@ -56,7 +56,7 @@ class Manual(unittest.TestCase):
             self.assertIn(f.split()[0], body, f)
 
     def test_preset_fields_and_types_documented(self):
-        src = open(os.path.join(HERE, "preset.py"), encoding="utf-8").read()
+        src = open(os.path.join(HERE, "src", "preset.py"), encoding="utf-8").read()
         point_src = src[src.index("class Point"):src.index("class Preset")]
         fields = set(re.findall(r'd\.get\("(\w+)"', point_src)) | set(re.findall(r'd\["(\w+)"\]', point_src))
         file_src = src[src.index("class Preset"):src.index("def load_preset")]
@@ -125,10 +125,10 @@ class Manual(unittest.TestCase):
             helpdocs.load(d2, reload=True)
 
     def test_cli(self):
-        out = subprocess.run([sys.executable, "helpdocs.py", "search", "fc03"], cwd=HERE, capture_output=True,
+        out = subprocess.run([sys.executable, os.path.join("src", "helpdocs.py"), "search", "fc03"], cwd=HERE, capture_output=True,
                              text=True, encoding="utf-8").stdout
         self.assertIn("fc03", out)
-        self.assertIn("Read Holding Registers", subprocess.run([sys.executable, "helpdocs.py", "show", "fc03"],
+        self.assertIn("Read Holding Registers", subprocess.run([sys.executable, os.path.join("src", "helpdocs.py"), "show", "fc03"],
                       cwd=HERE, capture_output=True, text=True, encoding="utf-8").stdout)
 
 

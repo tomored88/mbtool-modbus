@@ -23,7 +23,16 @@ def resource_dir():
     """Folder holding the bundled read-only files (help/, presets/)."""
     if FROZEN:
         return getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(sys.executable)))
-    return os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root: src/.. holds help/, presets/
+
+
+def icon_path():
+    """mbtool.ico: next to the bundled files in the exe, next to this module (src/) in a source checkout."""
+    for d in (resource_dir(), os.path.dirname(os.path.abspath(__file__))):
+        p = os.path.join(d, "mbtool.ico")
+        if os.path.isfile(p):
+            return p
+    return None
 
 
 def data_dir():

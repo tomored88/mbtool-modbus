@@ -80,7 +80,7 @@
 
 หน้าต่างตามช่องที่เลือก อัปเดตสดจากการ poll ล่าสุดโดยไม่อ่านเพิ่ม ดับเบิลคลิกแถวเพื่อคัดลอก ปุ่ม "Use as preset point..." สร้างจุดวัดใหม่ใน preset จากแถวที่เลือก ใช้ร่วมกับ [[word-order]]
 
-CLI: `python interpret.py --words 0x4348 0xCCCD` หรืออ่านจากอุปกรณ์ `python interpret.py tcp://host:502 -u 1 -a 0 -n 2`
+CLI: `python src/interpret.py --words 0x4348 0xCCCD` หรืออ่านจากอุปกรณ์ `python src/interpret.py tcp://host:502 -u 1 -a 0 -n 2`
 
 ## Traffic Monitor (F8)
 <!-- id: traffic-monitor | category: ฟีเจอร์ในโปรแกรม | keywords: traffic monitor f8 hex frame pdu tx rx err ดูข้อมูลที่ส่ง log สาย -->
@@ -191,7 +191,7 @@ preset จากคลังยังไม่ได้ยืนยันกั�
 5. เปิดโหมด PLC cycle กับของจริงหรือ simulator แล้ว **Compare with measured** ถ้าวัดได้ช้ากว่ามาก ให้แก้ response delay ใน Calculator ให้ตรง (ดู Worst response) แล้วออกแบบต่อจากตัวเลขที่ตรงกับจริง
 6. ตั้ง target ให้มากกว่า Max ที่วัดได้พอสมควร (เผื่อ jitter และ retry) แล้วดูว่า Overruns เป็น 0
 
-ทดลองโดยไม่มีฮาร์ดแวร์: `python mbtool.py vcom --baud 38400 --bits 10` (จำลองความเร็วสาย) และ `python mbtool.py sim --serial socket://127.0.0.1:7000 -u 1 --baud 38400 --delay 10` (หน่วงคำตอบ 10 ms) หรือช่อง **Response delay (ms)** ใน Slave Simulator ดู [[vcom]] และ [[slave-sim]]
+ทดลองโดยไม่มีฮาร์ดแวร์: `python src/mbtool.py vcom --baud 38400 --bits 10` (จำลองความเร็วสาย) และ `python src/mbtool.py sim --serial socket://127.0.0.1:7000 -u 1 --baud 38400 --delay 10` (หน่วงคำตอบ 10 ms) หรือช่อง **Response delay (ms)** ใน Slave Simulator ดู [[vcom]] และ [[slave-sim]]
 
 อยากเห็นว่าอุปกรณ์อยู่ตรงไหนบนสาย ความยาวสายเท่าไร และคำขอ/คำตอบวิ่งอย่างไร ดู [[bus-map]] (Ctrl+M)
 
@@ -297,7 +297,7 @@ preset จากคลังยังไม่ได้ยืนยันกั�
 
 ตัวเลขทั้งหมดเป็น **ค่าประมาณจากกฎทั่วไป** และค่าสายแบบทั่วไป ใส่ค่าจาก datasheet ของสายจริงในโหมด Custom และทดสอบกับของจริงเสมอ
 
-**ไฟล์:** แผนผังถูกเก็บในค่าตั้งของโปรแกรมและใน workspace (.mbw) ข้างรายการอุปกรณ์ ([[workspace]]) เมนู **Map > Save map as JSON... / Load map from JSON...** เก็บ/เปิดเป็นไฟล์แยก และ `python mbtool.py busmap map.json` พิมพ์รายงานเดียวกันจาก command line
+**ไฟล์:** แผนผังถูกเก็บในค่าตั้งของโปรแกรมและใน workspace (.mbw) ข้างรายการอุปกรณ์ ([[workspace]]) เมนู **Map > Save map as JSON... / Load map from JSON...** เก็บ/เปิดเป็นไฟล์แยก และ `python src/mbtool.py busmap map.json` พิมพ์รายงานเดียวกันจาก command line
 
 ## บันทึก log เป็น CSV
 <!-- id: logging | category: ฟีเจอร์ในโปรแกรม | keywords: log logging csv บันทึก ctrl+l ตัดไฟล์ rotation excel ตัวคั่น utf-8 bom -->
@@ -319,7 +319,7 @@ preset จากคลังยังไม่ได้ยืนยันกั�
 
 **Response delay (ms):** simulator รอเท่านี้ก่อนตอบทุกครั้ง เหมือนอุปกรณ์จริงที่ต้องใช้เวลาคิด (ปกติ 5-50 ms) มีผลทันทีแม้กำลังทำงาน ใช้คู่กับโหมด PLC cycle เพื่อวัดเวลารอบที่สมจริง ([[plc-cycle]])
 
-CLI: `python mbtool.py sim --port 5020 [--preset ไฟล์.json] [--signals random|loop|sine|profile] [--serial COM4 --mode rtu] [--delay 10]` ดู [[vcom]] และทำให้ค่าขยับได้: [[sim-signals]] ทำให้ตอบผิดพลาดโดยตั้งใจ: [[sim-faults]]
+CLI: `python src/mbtool.py sim --port 5020 [--preset ไฟล์.json] [--signals random|loop|sine|profile] [--serial COM4 --mode rtu] [--delay 10]` ดู [[vcom]] และทำให้ค่าขยับได้: [[sim-signals]] ทำให้ตอบผิดพลาดโดยตั้งใจ: [[sim-faults]]
 
 ## จำลองความผิดพลาด (แท็บ Faults ใน Slave Sim)
 <!-- id: sim-faults | category: ฟีเจอร์ในโปรแกรม | keywords: faults fault injection จำลอง ความผิดพลาด error ไม่ตอบ ตอบช้า crc เสีย exception garbage wrong id duplicate id ตัดการเชื่อมต่อ ทดสอบ plc scada master รับมือ -->
@@ -375,7 +375,7 @@ Slave จำลองทำให้ค่าเคลื่อนไหวเ�
 ```
 ชนิด (`kind`): `fixed`, `noise`, `random_walk`, `sine`, `ramp`, `triangle`, `square`, `sequence` (`values`, `hold` วินาที), `counter` (`start`, `rate` ต่อวินาที), `follow` (`signal` = load หรือ speed) ตัวเลือกร่วม: `min`, `max`, `period` (วินาที), `phase`, `noise`
 
-**ใช้จาก CLI และ AI:** `python mbtool.py sim --preset ไฟล์.json --signals profile [--device-type drive] [--speed 2]` หรือเครื่องมือ MCP `sim_start` แล้ว `sim_load_preset` ดู [[slave-sim]] [[preset-schema]]
+**ใช้จาก CLI และ AI:** `python src/mbtool.py sim --preset ไฟล์.json --signals profile [--device-type drive] [--speed 2]` หรือเครื่องมือ MCP `sim_start` แล้ว `sim_load_preset` ดู [[slave-sim]] [[preset-schema]]
 
 ข้อควรรู้: ค่าที่ได้เป็นการจำลองเพื่อทดสอบโปรแกรม ไม่ใช่ข้อมูลจากอุปกรณ์จริง และ preset ไลบรารีทั้งหมดยังเป็น UNVERIFIED
 

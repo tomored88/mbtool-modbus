@@ -6,7 +6,7 @@ files, poll counters and errors, and at the end reports growth so leaks or stall
   python tests/soak.py [minutes]  (default 20)  -> prints a report and writes soak_report.json in the temp folder
 """
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import ctypes
 import ctypes.wintypes
 import gc

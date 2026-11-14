@@ -1,6 +1,6 @@
 """RTU master <-> RTU slave over a software null-modem (no COM driver needed)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import time
 import unittest
 

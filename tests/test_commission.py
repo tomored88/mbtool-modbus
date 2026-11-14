@@ -1,7 +1,7 @@
 """Commissioning report: HTML render (English / Thai, escaping, verdict), PDF through headless Edge, and the
 File > Commissioning report dialog driven in-process with the demo devices."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import tempfile
 import time

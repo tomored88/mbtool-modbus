@@ -5,7 +5,7 @@ between slaves (a slave seeing another slave's answer glued to the next request)
   python tests/load_bus.py [devices=40] [baud=115200] [cycles=5]
 """
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import sys
 import time
 

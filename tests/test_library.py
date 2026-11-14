@@ -1,7 +1,7 @@
 """Every preset in presets/ must load, carry sources, be flagged unverified unless a verified_note exists,
 and read back cleanly from a simulator filled from it."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import glob
 import os
 import unittest

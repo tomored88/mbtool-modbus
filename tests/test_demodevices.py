@@ -1,7 +1,7 @@
 """Devices > Demo devices: simulated devices appear as tabs without any hardware, values move, nothing is saved,
 stopping removes them. Driven in-process (no real clicks)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import tempfile
 import time

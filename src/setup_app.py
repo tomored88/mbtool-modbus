@@ -125,7 +125,7 @@ class Installer:
         s = self.s
         root.title(f"Install {appinfo.APP_TITLE} {appinfo.VERSION}")
         root.resizable(False, False)
-        ico = os.path.join(appinfo.resource_dir(), "mbtool.ico")
+        ico = appinfo.icon_path()
         if os.path.isfile(ico):
             try:
                 root.iconbitmap(ico)

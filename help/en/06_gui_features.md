@@ -80,7 +80,7 @@ Shows the value of the selected register (including 1, 2 or 4 consecutive regist
 
 The window follows the selected cell and updates live from the latest poll without extra reads. Double-click a row to copy. The "Use as preset point..." button creates a new point in a preset from the selected row. Use together with [[word-order]]
 
-CLI: `python interpret.py --words 0x4348 0xCCCD` or read from a device `python interpret.py tcp://host:502 -u 1 -a 0 -n 2`
+CLI: `python src/interpret.py --words 0x4348 0xCCCD` or read from a device `python src/interpret.py tcp://host:502 -u 1 -a 0 -n 2`
 
 ## Traffic Monitor (F8)
 <!-- id: traffic-monitor | category: Program features | keywords: traffic monitor, f8, hex, frame, pdu, tx, rx, err, view sent data, log, line -->
@@ -191,7 +191,7 @@ The **Calculator** tab (usable without polling): enter the line type RTU/ASCII/T
 5. Turn on PLC cycle mode with the real hardware or a simulator, then **Compare with measured**. If the measured time is much slower, adjust the response delay in the Calculator to match (see Worst response), then continue designing from numbers that agree with reality
 6. Set the target comfortably above the measured Max (allowing for jitter and retries), then check that Overruns stays at 0
 
-Experiment without hardware: `python mbtool.py vcom --baud 38400 --bits 10` (simulates line speed) and `python mbtool.py sim --serial socket://127.0.0.1:7000 -u 1 --baud 38400 --delay 10` (delays responses by 10 ms), or the **Response delay (ms)** field in the Slave Simulator. See [[vcom]] and [[slave-sim]]
+Experiment without hardware: `python src/mbtool.py vcom --baud 38400 --bits 10` (simulates line speed) and `python src/mbtool.py sim --serial socket://127.0.0.1:7000 -u 1 --baud 38400 --delay 10` (delays responses by 10 ms), or the **Response delay (ms)** field in the Slave Simulator. See [[vcom]] and [[slave-sim]]
 
 To see where devices sit on the line, how long the cable is, and how requests/responses travel, see [[bus-map]] (Ctrl+M)
 
@@ -297,7 +297,7 @@ Open it from the menu **Tools > Bus map...** (Ctrl+M) or the **Bus map...** butt
 
 All figures are **estimates from general rules** and typical cable values. Enter datasheet values of your real cable in Custom mode and always verify against the real installation.
 
-**Files:** the map is stored in the program settings and in the workspace (.mbw) alongside the device list ([[workspace]]). The menu **Map > Save map as JSON... / Load map from JSON...** saves/opens it as a separate file, and `python mbtool.py busmap map.json` prints the same report from the command line.
+**Files:** the map is stored in the program settings and in the workspace (.mbw) alongside the device list ([[workspace]]). The menu **Map > Save map as JSON... / Load map from JSON...** saves/opens it as a separate file, and `python src/mbtool.py busmap map.json` prints the same report from the command line.
 
 ## Logging to CSV
 <!-- id: logging | category: Program features | keywords: log, logging, csv, record, ctrl+l, file rotation, rotation, excel, delimiter, utf-8, bom -->
@@ -319,7 +319,7 @@ Simulates a Modbus device in the GUI (F9): choose TCP, RTU or ASCII and the Slav
 
 **Response delay (ms):** the simulator waits this long before every answer, like a real device that needs time to think (typically 5-50 ms). It takes effect immediately even while running. Use it with PLC cycle mode to measure a realistic cycle time ([[plc-cycle]]).
 
-CLI: `python mbtool.py sim --port 5020 [--preset file.json] [--signals random|loop|sine|profile] [--serial COM4 --mode rtu] [--delay 10]`. See [[vcom]]. To make the values move: [[sim-signals]]. To make it answer wrongly on purpose: [[sim-faults]].
+CLI: `python src/mbtool.py sim --port 5020 [--preset file.json] [--signals random|loop|sine|profile] [--serial COM4 --mode rtu] [--delay 10]`. See [[vcom]]. To make the values move: [[sim-signals]]. To make it answer wrongly on purpose: [[sim-faults]].
 
 ## Fault injection (Faults tab in Slave Sim)
 <!-- id: sim-faults | category: Program features | keywords: faults, fault injection, simulate, error, no reply, slow answer, bad crc, exception, garbage, wrong id, duplicate id, disconnect, test, plc, scada, master, handling -->
@@ -375,7 +375,7 @@ The device type is guessed from the preset's names/units, or you can put `"devic
 ```
 Kinds (`kind`): `fixed`, `noise`, `random_walk`, `sine`, `ramp`, `triangle`, `square`, `sequence` (`values`, `hold` seconds), `counter` (`start`, `rate` per second), `follow` (`signal` = load or speed). Common options: `min`, `max`, `period` (seconds), `phase`, `noise`.
 
-**Use from the CLI and AI:** `python mbtool.py sim --preset file.json --signals profile [--device-type drive] [--speed 2]`, or the MCP tool `sim_start` and then `sim_load_preset`. See [[slave-sim]] [[preset-schema]].
+**Use from the CLI and AI:** `python src/mbtool.py sim --preset file.json --signals profile [--device-type drive] [--speed 2]`, or the MCP tool `sim_start` and then `sim_load_preset`. See [[slave-sim]] [[preset-schema]].
 
 Note: the values produced are a simulation for testing your software, not data from a real device, and all library presets are still UNVERIFIED.
 

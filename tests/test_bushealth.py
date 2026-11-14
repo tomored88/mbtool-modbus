@@ -1,6 +1,6 @@
 """Bus health test (bushealth.py) and the per-device error breakdown (monitor.classify_error / LineQuality)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import unittest
 
 import bushealth

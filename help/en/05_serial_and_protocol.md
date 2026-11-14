@@ -66,9 +66,9 @@ There is no CRC because TCP checks integrity itself. For a real example see [[tr
 <!-- id: scanner | category: Serial and protocol | keywords: scan auto search baud parity slave id find device identify register range -->
 `scanner.py` (and the matching MCP tool) tries connection settings for you. Everything is read-only.
 
-- `python scanner.py serial COM3 --units 1-10,247` tries baud × parity × stop bits × Slave ID, ordering the most common values first. It reports the correct settings and "noise" (settings that returned data that could not be decoded, meaning you are close)
-- `python scanner.py ids URL` which Slave IDs respond
-- `python scanner.py regs URL -u 1 --start 0 --end 999` the readable register ranges, using bisection to find the exact boundaries
-- `python scanner.py identify URL -u 1` asks for the device model (FC43/14, FC17) and suggests a preset
+- `python src/scanner.py serial COM3 --units 1-10,247` tries baud × parity × stop bits × Slave ID, ordering the most common values first. It reports the correct settings and "noise" (settings that returned data that could not be decoded, meaning you are close)
+- `python src/scanner.py ids URL` which Slave IDs respond
+- `python src/scanner.py regs URL -u 1 --start 0 --end 999` the readable register ranges, using bisection to find the exact boundaries
+- `python src/scanner.py identify URL -u 1` asks for the device model (FC43/14, FC17) and suggests a preset
 
 Limitations: tested against the simulator only. The behavior of real devices with a wrong baud rate may differ. The scan takes longer when many Slave IDs are tried.

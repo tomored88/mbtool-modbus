@@ -3,7 +3,7 @@
 import os
 import zipfile
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
 SRC = os.path.join(HERE, "dist", "mbtool")
 OUT = os.path.join(HERE, "dist", "mbtool-portable.zip")
 NOTE = ("mbtool portable mode\r\n\r\nThis file makes mbtool keep its settings, presets and logs in the 'data' folder\r\n"

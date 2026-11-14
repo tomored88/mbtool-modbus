@@ -2,7 +2,7 @@
 live-follow queue, layout) and the window driven in-process (import from Devices, in-place editing, warnings,
 persistence in settings / workspace / JSON, animation phases, clean close, live follow from a traffic deque)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import collections
 import json
 import os
@@ -316,7 +316,7 @@ class Gui(unittest.TestCase):
             f.write("{not json")
         self.assertIsNone(w.load_json(bad))
         # the same file works with the CLI subcommand and busmap.py
-        out = subprocess.run([sys.executable, "mbtool.py", "busmap", p], cwd=HERE, capture_output=True, text=True,
+        out = subprocess.run([sys.executable, os.path.join("src", "mbtool.py"), "busmap", p], cwd=HERE, capture_output=True, text=True,
                              encoding="utf-8").stdout
         self.assertIn("Trunk", out)
         self.assertIn("Checks:", out)

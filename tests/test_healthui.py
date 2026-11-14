@@ -1,7 +1,7 @@
 """Devices > Health test tab and the error-type / response-time columns, driven in-process with the RTU demo
 line (no real clicks, no hardware)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import tempfile
 import time

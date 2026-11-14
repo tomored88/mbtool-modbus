@@ -1,6 +1,6 @@
 """One COM port, many users: Poll 1, poll tabs and devices share one SerialMaster and take turns (PortHub)."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import tempfile
 import threading

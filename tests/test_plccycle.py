@@ -3,7 +3,7 @@ target / overrun), and an in-process run of the GUI: 3 simulated RTU devices beh
 baud with a 10 ms response delay - the measured cycle must be near buscalc's estimate; the independent mode
 keeps working as before."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import json
 import os
 import tempfile

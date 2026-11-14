@@ -51,7 +51,7 @@ MCP ปฏิเสธการเขียนผ่าน preset ที่ย�
 
 ผลเป็น PASS / FAIL / WARN / SKIP **โหมดค่าตั้งต้นอ่านอย่างเดียว** ปลอดภัยกับอุปกรณ์จริง การทดสอบเขียน (FC05/06/15/16/22/23) ต้องเปิดเอง (`--write --scratch <address>`) และคืนค่าเดิมหลังทดสอบ
 
-`python testcenter.py tcp://host:502 -u 1 --addr 0`
+`python src/testcenter.py tcp://host:502 -u 1 --addr 0`
 
 ## สร้าง Preset จากคู่มือใหม่
 <!-- id: preset-howto | category: Preset และเครื่องมือ | keywords: สร้าง preset ใหม่ csv excel นำเข้า register map คู่มือ วิธี -->
@@ -65,14 +65,14 @@ MCP ปฏิเสธการเขียนผ่าน preset ที่ย�
 `mbtool_mcp.py` คือ MCP server ให้ AI ที่รองรับ MCP เรียกใช้ได้: เชื่อมต่อ อ่านค่า สรุปค่าซ้ำ ดู traffic สแกน ระบุอุปกรณ์ ตีความ register รายงานวินิจฉัย Test Center อ่านตาม preset และค้นคู่มือนี้
 
 - **stdio:** โปรแกรมไคลเอนต์เปิดเอง ลงทะเบียนด้วยไฟล์ `.mcp.json` (ตัวอย่างใน `.mcp.json.example`)
-- **HTTP:** `python mbtool_mcp.py --http` แชร์ให้ AI ของคนอื่น ต้องมี token ดู [[mcp-security]]
+- **HTTP:** `python src/mbtool_mcp.py --http` แชร์ให้ AI ของคนอื่น ต้องมี token ดู [[mcp-security]]
 - **การเขียนค่าปิดเป็นค่าเริ่มต้น** เปิดด้วย `MBTOOL_ALLOW_WRITE=1` และระบุช่วงใน `MBTOOL_WRITE_ALLOW` เช่น `1:3:100-110;1:0:0-7` (Slave:พื้นที่:ช่วง พื้นที่ 3 = holding, 0 = coil)
 
 เครื่องมือหลัก: `status`, `connect`, `read`, `snapshot`, `get_traffic`, `sim_start`, `sim_load_preset` (ค่าจำลองขยับตาม preset ดู [[sim-signals]]), `scan_serial_settings`, `scan_unit_ids`, `scan_register_map`, `identify_device`, `interpret_registers`, `diagnostic_report`, `test_center`, `list_presets`, `preset_read`, `search_help`, `get_help`
 
 ## ตรวจตัวโปรแกรมเอง (Self test)
 <!-- id: selftest | category: Preset และเครื่องมือ | keywords: selftest self test ตรวจ ทดสอบ โปรแกรม ติดตั้ง exe ใช้ได้ไหม pass fail -->
-คำสั่ง `mbtool-cli.exe selftest` (ตัวติดตั้ง/portable) หรือ `python mbtool.py selftest` ตรวจว่าโปรแกรมบนเครื่องนี้ทำงานครบ โดยไม่ต้องมีอุปกรณ์จริง แล้วพิมพ์ PASS / FAIL ทีละข้อ:
+คำสั่ง `mbtool-cli.exe selftest` (ตัวติดตั้ง/portable) หรือ `python src/mbtool.py selftest` ตรวจว่าโปรแกรมบนเครื่องนี้ทำงานครบ โดยไม่ต้องมีอุปกรณ์จริง แล้วพิมพ์ PASS / FAIL ทีละข้อ:
 
 - preset ในไลบรารีเปิดได้ทุกไฟล์
 - อ่าน/เขียน TCP กับ simulator, RTU บนสายจำลอง 3 slave และการต่อใหม่หลัง TCP หลุด
@@ -96,14 +96,14 @@ MCP ปฏิเสธการเขียนผ่าน preset ที่ย�
 
 | คำสั่ง | ทำอะไร |
 |---|---|
-| `python mbtool.py` | เปิด GUI |
-| `python mbtool.py read URL -u 1 -f 3 -a 0 -n 10 [--fmt Float] [--scan 1000] [--log out.csv]` | อ่านค่า |
-| `python mbtool.py write URL -u 1 -f 16 -a 50 --fmt Float 3.14` | เขียนค่า |
-| `python mbtool.py sim --port 5020 [--preset f.json] [--signals profile --device-type drive --speed 2] [--serial COM4 --mode rtu]` | slave จำลอง ค่าขยับตามโหมด ([[sim-signals]]) |
-| `python mbtool.py vcom --port 7000` | สายจำลอง null-modem |
-| `python mbtool.py preset-list / preset-read / preset-write` | ทำงานกับ preset |
-| `python scanner.py serial COM3` | สแกนค่าเชื่อมต่อ ([[scanner]]) |
-| `python testcenter.py URL` | ตรวจ slave ([[testcenter]]) |
-| `python interpret.py --words 0x4348 0xCCCD` | ตีความ register ([[inspector]]) |
-| `python helpdocs.py search คำ` | ค้นคู่มือนี้ |
-| `mbtool-cli.exe selftest` (หรือ `python mbtool.py selftest`) | ตรวจตัวโปรแกรมบนเครื่องนี้โดยไม่ต้องมีอุปกรณ์ ([[selftest]]) |
+| `python src/mbtool.py` | เปิด GUI |
+| `python src/mbtool.py read URL -u 1 -f 3 -a 0 -n 10 [--fmt Float] [--scan 1000] [--log out.csv]` | อ่านค่า |
+| `python src/mbtool.py write URL -u 1 -f 16 -a 50 --fmt Float 3.14` | เขียนค่า |
+| `python src/mbtool.py sim --port 5020 [--preset f.json] [--signals profile --device-type drive --speed 2] [--serial COM4 --mode rtu]` | slave จำลอง ค่าขยับตามโหมด ([[sim-signals]]) |
+| `python src/mbtool.py vcom --port 7000` | สายจำลอง null-modem |
+| `python src/mbtool.py preset-list / preset-read / preset-write` | ทำงานกับ preset |
+| `python src/scanner.py serial COM3` | สแกนค่าเชื่อมต่อ ([[scanner]]) |
+| `python src/testcenter.py URL` | ตรวจ slave ([[testcenter]]) |
+| `python src/interpret.py --words 0x4348 0xCCCD` | ตีความ register ([[inspector]]) |
+| `python src/helpdocs.py search คำ` | ค้นคู่มือนี้ |
+| `mbtool-cli.exe selftest` (หรือ `python src/mbtool.py selftest`) | ตรวจตัวโปรแกรมบนเครื่องนี้โดยไม่ต้องมีอุปกรณ์ ([[selftest]]) |

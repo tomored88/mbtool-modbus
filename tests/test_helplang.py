@@ -1,7 +1,7 @@
 """Two-language manual: help/en mirrors help/*.md topic for topic, the language switch (helpdocs, Help window,
 Help menu, saved setting) and the MCP help tools' lang argument."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import os
 import re
 import tempfile

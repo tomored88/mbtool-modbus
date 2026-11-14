@@ -4,7 +4,7 @@ import sys
 import time
 import unittest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
 from modbus_core import SimSlave
 from preset import Preset, PresetError, load_preset
 from signals import DEVICE_TYPES, MODES, Pattern, SignalEngine, guess_device_type

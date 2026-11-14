@@ -3,7 +3,7 @@
 their own link, can be renamed / duplicated / closed, follow the first tab's connection or use their own, show their
 state as a dot on the tab strip, survive a settings and a workspace round trip, and leave no after() jobs behind."""
 import os as _os, sys as _sys
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "src"))
 import json
 import os
 import struct
