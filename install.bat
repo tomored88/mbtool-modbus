@@ -11,6 +11,6 @@ echo Optional check:  .venv\Scripts\python.exe src\mbtool.py selftest
 pause
 exit /b 0
 :fail
-echo Installation failed. Python 3.10 or newer is required (https://www.python.org/downloads/).
+echo Installation failed. Python 3.11 or newer is required (https://www.python.org/downloads/).
 pause
 exit /b 1

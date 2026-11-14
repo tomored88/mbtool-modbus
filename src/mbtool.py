@@ -12,6 +12,10 @@
 import sys
 import types
 
+if sys.version_info < (3, 11):  # 3.10's time.sleep on Windows is ~15 ms coarse: RTU gaps / PLC cycles go wrong
+    sys.exit(f"mbtool needs Python 3.11 or newer (this is {sys.version.split()[0]}). "
+             "Install a newer Python from https://www.python.org/downloads/ or use the Windows installer.")
+
 from mbui import (ai_ui, app, busmap_ui, cli, common, devices, dialogs, export_ui, grids, help_ui,  # noqa: F401
                   inspector, polltabs, presets_ui, simwin, traffic, trend)
 from mbui.cli import main

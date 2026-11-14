@@ -1,7 +1,7 @@
 # mbtool architecture
 
 A map for contributors: what each file does, how data flows from a Modbus device to the screen, and where to put a
-change. Plain Python 3.10+ with tkinter; pyserial for serial ports; the `mcp` package only for the MCP server.
+change. Plain Python 3.11+ with tkinter; pyserial for serial ports; the `mcp` package only for the MCP server.
 
 ## Layers
 

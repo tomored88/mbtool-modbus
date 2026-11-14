@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.10", "3.13"]  # the oldest supported version (README: 3.10+) and the newest
+        python: ["3.11", "3.13"]  # the oldest supported version (README: 3.11+) and the newest
     env:
       PYTHONIOENCODING: utf-8
       PYTHONUTF8: "1"
