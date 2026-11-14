@@ -62,6 +62,17 @@ class HealthUI(unittest.TestCase):
         self.assertEqual(app.dev_status[self.names[0]].quality.requests, 0)
         self.assertEqual(tab.l["quality"].cget("text"), "-")
 
+    def test_1b_summary_is_not_cut_off(self):
+        """The '5 devices: 5 ok, ...' summary gets the width it needs (it used to be squeezed out of the toolbar)."""
+        win = self.win
+        win.nb.select(win.overview)
+        win.refresh_states()
+        self.wait(lambda: False, 0.5)
+        lab = win.l_sum
+        self.assertTrue(lab.cget("text").startswith("5 devices"), lab.cget("text"))
+        self.assertTrue(lab.winfo_ismapped())
+        self.assertGreaterEqual(lab.winfo_width(), lab.winfo_reqwidth(), "summary text is cut off")
+
     def test_2_health_tab_runs_pauses_and_resumes(self):
         app, win = self.app, self.win
         ht = win.health_tab

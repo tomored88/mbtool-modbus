@@ -88,11 +88,11 @@ class DevicesWindow:
         self.l_gap.pack(side="left", padx=(4, 0))
         self.gap.trace_add("write", lambda *_: self._gap())
         self.b_help = add_help_button(app, w, self._help, parent=tb, side="right", padx=(8, 0))
-        self.l_sum = ttk.Label(tb, text="", style="Info.TLabel")
-        self.l_sum.pack(side="right")
-        # scan mode row
+        # scan mode row; the device summary sits at its right end (the toolbar has no room left for it)
         mf = ttk.Frame(ov, padding=(8, 0, 8, 4))
         mf.pack(fill="x")
+        self.l_sum = ttk.Label(mf, text="", style="Info.TLabel")
+        self.l_sum.pack(side="right")  # packed first, so it keeps its space when the window gets narrow
         ttk.Label(mf, text="Scan mode:").pack(side="left", padx=(0, 4))
         self.mode_var = tk.StringVar(value=mon.SCAN_MODES[mon.norm_scan_mode(app.cfg["devices"].get("scan_mode"))])
         self.cb_mode = ttk.Combobox(mf, textvariable=self.mode_var, values=list(mon.SCAN_MODES.values()),
