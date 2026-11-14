@@ -53,6 +53,9 @@ python src/mbtool.py selftest           # the self test that also ships in the e
 - New features need tests. Pure logic goes into a module without Tk (see `monitor.py`, `bushealth.py`,
   `export.py`) and gets plain unit tests; the GUI part gets an in-process test like `tests/test_healthui.py`.
 - `tests/soak.py` (long run) and `tests/load_bus.py` (many devices) are manual tools, not part of the suite.
+- Keep `--capture=sys` in `pytest.ini`: pytest's default fd capture makes Tk's start-up fail intermittently on
+  Windows. Time anything at millisecond scale with `time.perf_counter()` - `time.monotonic()` ticks only every
+  ~15.6 ms on Windows before Python 3.13.
 
 ## Building the Windows app
 
