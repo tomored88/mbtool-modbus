@@ -54,7 +54,7 @@ mbtool is new and not code-signed, so Windows has no reputation for it yet:
 
 | Folder / file | Contents |
 |---|---|
-| `src/` | the program (Python): `mbtool.py` is the main program, the other files are its modules |
+| `src/` | the program (Python): `mbtool.py` starts it, `mbui/` holds the windows (one module each), the other files are the logic (protocol, presets, bus tools ...) |
 | `help/` | the built-in manual (Thai in `help/`, English in `help/en/`) |
 | `presets/` | device register maps (JSON) - the library of 30 models is UNVERIFIED |
 | `docs/` | feature sheets and sample commissioning reports |

@@ -106,6 +106,17 @@ class Dialog(unittest.TestCase):
             self.assertTrue(all(x["values"] for x in data["devices"]))
             dlg._remember(dlg.form())
             self.assertEqual(app.cfg["report"]["project"], "Demo plant")
+            import webbrowser
+            opened, saved_open = [], webbrowser.open
+            webbrowser.open = lambda url, *a, **k: opened.append(url)
+            try:
+                path = dlg.preview()  # was a NameError (tempfile not imported) until 1.1.x
+            finally:
+                webbrowser.open = saved_open
+            self.assertTrue(path and os.path.isfile(path), path)
+            self.assertEqual(len(opened), 1)
+            with open(path, encoding="utf-8") as f:
+                self.assertIn("Demo plant", f.read())
             dlg.close()
             app.stop_demo()
             app.stop_all_devices()

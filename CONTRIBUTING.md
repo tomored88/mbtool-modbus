@@ -66,6 +66,8 @@ Check the result with `dist\mbtool\mbtool-cli.exe selftest`. The version number 
 ## Code guidelines
 
 - Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) first: where things live and how the threads talk to the GUI.
+- GUI code lives in `src/mbui/`, one module per window. A module that needs a class from a sibling module imports it
+  at the bottom of the file (see the existing modules) and only uses it inside functions.
 - Python standard library + pyserial for the program; `mcp` only for the MCP server. Ask in an issue before adding a
   new dependency (it also has to work in the PyInstaller build).
 - Never touch Tk from a worker thread: post a message to the app queue and handle it on the GUI thread.

@@ -7,7 +7,9 @@ change. Plain Python 3.10+ with tkinter; pyserial for serial ports; the `mcp` pa
 
 ```
             GUI (tkinter)                      CLI                     MCP server (for AI)
-          src/mbtool.py               src/mbtool.py cli_*()            src/mbtool_mcp.py
+       src/mbui/*.py (one module      src/mbui/cli.py                  src/mbtool_mcp.py
+       per window), started by        (started by src/mbtool.py)
+       src/mbtool.py
                │                               │                              │
                └──────────────┬────────────────┴──────────────┬───────────────┘
                               │                               │
@@ -20,14 +22,15 @@ change. Plain Python 3.10+ with tkinter; pyserial for serial ports; the `mcp` pa
         files / paths:     appinfo.py       (version, data folders, crash log, portable mode)
 ```
 
-Rule of thumb: **anything that can be tested without a window lives outside `mbtool.py`**. `mbtool.py` only builds
-windows, keeps their state and calls the logic modules.
+Rule of thumb: **anything that can be tested without a window lives outside `mbui/`**. The `mbui` modules only
+build windows, keep their state and call the logic modules.
 
 ## Files in `src/`
 
 | File | Role |
 |---|---|
-| `mbtool.py` | Entry point. `main()` parses the command line: no sub-command starts the GUI (`gui()`), sub-commands `read`, `write`, `sim`, `vcom`, `preset-*`, `busmap`, `health`, `mcp`, `selftest` run the CLI. Contains every window class (see below). |
+| `mbtool.py` | Entry point (`python src/mbtool.py`, and what PyInstaller builds). Imports the `mbui` package and calls `mbui.cli.main()`. Every name of the package is also reachable as `mbtool.<name>` (e.g. `mbtool.MasterApp`), and `mbtool.SETTINGS_FILE = path` redirects the settings file - tests rely on both. |
+| `mbui/` | The GUI and the command line, one module per window - see the next section. |
 | `modbus_core.py` | The protocol, written from the public Modbus specification: PDU build / parse, `TcpMaster`, `SerialMaster` (RTU / ASCII, t3.5 gap, late-answer guard), `SimSlave` (TCP slave + the shared data store), `SerialSlave`, `VirtualCable` (emulated RS-485 line over `socket://`), `PortHub` / `HubMaster` (one shared master per COM port), `Faults` (fault injection), display formats. |
 | `monitor.py` | All non-GUI logic of the monitoring features: settings normalisation, device lists, address bases, multi-type rows, `MultiPoller` / `BusWorker` (polling threads for the Devices window, independent and PLC cycle mode), `DeviceStatus` and `LineQuality` (per-device counters, error types), cycle statistics, trend buffer, alarms, workspace files. |
 | `preset.py` | Device presets: JSON register maps (`Preset`, `Point`), validation, read blocks, value decoding / encoding, CSV import. |
@@ -49,23 +52,32 @@ windows, keeps their state and calls the logic modules.
 | `setup_app.py` | The Windows installer / uninstaller (packed into `mbtool-setup.exe`). |
 | `appinfo.py` | Version, file locations (`%APPDATA%\mbtool` installed, `.\data` portable, repo root from source, `MBTOOL_HOME` override), preset seeding, crash handler. |
 
-## Windows in `mbtool.py`
+## The GUI package `src/mbui/`
 
-| Class | Window / part |
-|---|---|
-| `MasterApp` | Main window: toolbar, poll tabs, Poll 1 connection and polling, menus, settings, workspace, the message queue |
-| `RegGrid`, `MultiGrid` | The register table (one format) and the multi-type table |
-| `TabStrip`, `PollTab` | Poll tabs in the main window |
-| `SetupDialog`, `WriteDialog`, `Inspector` | Connection setup (F3), write (F6), value inspector (F4) |
-| `PresetView`, `PresetsDialog`, `PresetEditor` | Preset view and editor (F7) |
-| `TrafficView`, `TrafficWindow` | Traffic monitor (F8) |
-| `SimWindow` | Slave simulator (F9) with Signals and Faults tabs |
-| `TrendWindow`, `AlertsWindow` | Trend (F10), alerts |
-| `DevicesWindow`, `DeviceTab`, `CycleTab`, `CalcTab`, `HealthTab`, `DeviceDialog`, `ScanAddDialog` | Devices window (F11) and its tabs |
-| `BusMapWindow` | RS-485 bus map (Ctrl+M) |
-| `ExportWindow`, `ReportDialog`, `LogOptionsDialog` | Data export, commissioning report, CSV log options |
-| `AiShare`, `AiAssistWindow` | AI Assist (F12): MCP over HTTP sharing the live connection, diagnostic report |
-| `HelpWindow` | The manual (F1) |
+| Module | Classes | Window / part |
+|---|---|---|
+| `common.py` | `Tooltip`, `Lamp`, `Dialog`, `MessageDialog`, `ConfirmDialog` | shared imports, settings (`load_settings`, `save_settings`, `DEFAULTS`), constants, small helpers (`master_factory`, `int_in`, `addr_label`, help buttons ...) |
+| `app.py` | `MasterApp` | main window: toolbar, poll tabs, Poll 1 connection and polling, menus, settings, workspace, the message queue |
+| `grids.py` | `RegGrid`, `MultiGrid` | the register table (one format) and the multi-type table |
+| `polltabs.py` | `TabStrip`, `PollTab` | poll tabs in the main window |
+| `dialogs.py` | `SetupDialog`, `WriteDialog`, `MultiColumnsDialog`, `LogOptionsDialog` | connection setup (F3), write (F6), multi-type columns, CSV log options |
+| `inspector.py` | `Inspector` | value inspector (F4) |
+| `presets_ui.py` | `PresetView`, `PresetsDialog`, `PresetEditor` | preset view and editor (F7) |
+| `traffic.py` | `TrafficView`, `TrafficWindow` | traffic monitor (F8) |
+| `simwin.py` | `SimWindow`, `SimPresetPicker`, `SigPatternDialog` | slave simulator (F9) with Signals and Faults tabs |
+| `trend.py` | `TrendWindow`, `AlertsWindow` | trend (F10), alerts |
+| `devices.py` | `DevicesWindow`, `DeviceTab`, `CycleTab`, `CalcTab`, `HealthTab`, `DeviceDialog`, `ScanAddDialog` | Devices window (F11) and its tabs |
+| `busmap_ui.py` | `BusMapWindow` | RS-485 bus map (Ctrl+M) |
+| `export_ui.py` | `ExportWindow`, `ReportDialog`, `UpdateDialog` | data export, commissioning report, update available |
+| `ai_ui.py` | `AiShare`, `AiAssistWindow` | AI Assist (F12): MCP over HTTP sharing the live connection, diagnostic report |
+| `help_ui.py` | `HelpWindow` | the manual (F1) |
+| `cli.py` | - | `read` / `write` / `sim` / `vcom` / `preset-*` / `busmap` commands, `gui()` and `main()` |
+
+How the modules import each other: every module starts with `from .common import *` (shared imports, settings,
+constants, helpers). Names from a sibling module are imported **at the bottom** of the module (`from .devices import
+DevicesWindow`), so modules can refer to each other without import cycles - such names may only be used inside
+functions and methods, not at import time. `tests/test_names.py` fails when a module uses a name that is never
+defined or imported.
 
 ## Threads and the GUI
 
@@ -116,7 +128,7 @@ Hardware is replaced by `SimSlave`, `SerialSlave` on a `VirtualCable`, `Faults`,
 | support a new function code or fix framing | `modbus_core.py` (+ `tests/test_core.py`, `tests/test_rtu.py`) |
 | add a preset field or data type | `preset.py`, the manual topic `preset-schema` in both languages |
 | change how devices are polled or counted | `monitor.py` (`MultiPoller`, `BusWorker`, `DeviceStatus`) |
-| add a window or a tab | a new class in `mbtool.py`, logic in a new module, an in-process GUI test |
+| add a window or a tab | a new module (or class) in `src/mbui/`, logic in a module outside `mbui`, an in-process GUI test |
 | give the AI a new tool | `mbtool_mcp.py` (read-only unless it is a deliberate, guarded write) |
 | change the manual | `help/*.md` and `help/en/*.md` (same ids; `tests/test_helplang.py` checks parity) |
 | change the installer / exe | `packaging/` and `src/setup_app.py` |
