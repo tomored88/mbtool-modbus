@@ -112,7 +112,7 @@ The two downloads above ([Releases](https://github.com/tomored88/mbtool-modbus/r
 - Build both yourself: `packaging\build_exe.bat` (needs `pip install pyinstaller pillow`); output in `dist\`. The exe is unsigned, so Windows
   SmartScreen may warn on first run ("More info" > "Run anyway").
 
-## Run from source (Windows, Python 3.10+)
+## Run from source (Windows, Python 3.11+)
 
 ```
 install.bat          creates .venv and installs requirements
@@ -258,7 +258,7 @@ Microsoft Defender แล้ว) กด **More info** แล้วกด **Run a
 
 - **preset ทุกไฟล์ยังไม่ผ่านการทดสอบกับอุปกรณ์จริง** ต้องเทียบค่ากับหน้าจอเครื่องก่อนใช้งานจริง
 - MCP ปิดการเขียนค่าเป็นค่าเริ่มต้น เปิดได้ด้วยตัวแปร `MBTOOL_ALLOW_WRITE=1` และระบุช่วง address ที่อนุญาตเท่านั้น
-- รันจากโค้ด (สำหรับนักพัฒนา): ดับเบิลคลิก `install.bat` แล้วเปิดด้วย `run.bat` (ต้องมี Python 3.10 ขึ้นไป)
+- รันจากโค้ด (สำหรับนักพัฒนา): ดับเบิลคลิก `install.bat` แล้วเปิดด้วย `run.bat` (ต้องมี Python 3.11 ขึ้นไป)
 - ทดสอบ RTU โดยไม่มีฮาร์ดแวร์ได้ด้วย `python src/mbtool.py vcom` (สายจำลองผ่าน TCP)
 
 ## Contributing

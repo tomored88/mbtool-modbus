@@ -23,7 +23,8 @@ same [MIT license](LICENSE).
 
 ## Development setup
 
-Windows 10 / 11, Python 3.10 or newer (CI uses 3.13).
+Windows 10 / 11, Python 3.11 or newer (CI tests 3.11 and 3.13). 3.10 is not enough: its `time.sleep` on
+Windows is only accurate to about 15 ms, which breaks the RTU frame gaps and the PLC cycle timing.
 
 ```
 git clone https://github.com/tomored88/mbtool-modbus.git
@@ -96,7 +97,7 @@ Check the result with `dist\mbtool\mbtool-cli.exe selftest`. The version number 
 
 - **แจ้งบั๊ก:** เปิด [issue](../../issues/new/choose) บอกเวอร์ชัน สิ่งที่ทำ ผลที่ควรได้ และผลที่ได้จริง แนบ Traffic (F8) หรือ `crash.log` ถ้ามี
 - **ตรวจ preset กับเครื่องจริง:** preset ทุกไฟล์ยังเป็น `"verified": false` ถ้ามีอุปกรณ์ เทียบค่ากับหน้าจอเครื่องแล้วส่งที่แก้มา ช่วยผู้ใช้ได้มากที่สุด
-- **ติดตั้งเพื่อพัฒนา:** `install.bat` แล้ว `run.bat` (ต้องมี Python 3.10 ขึ้นไป) ไม่ต้องมีฮาร์ดแวร์ ใช้ Demo devices หรือ `python src/mbtool.py sim` ได้
+- **ติดตั้งเพื่อพัฒนา:** `install.bat` แล้ว `run.bat` (ต้องมี Python 3.11 ขึ้นไป) ไม่ต้องมีฮาร์ดแวร์ ใช้ Demo devices หรือ `python src/mbtool.py sim` ได้
 - **ทดสอบ:** `python -m pytest tests` ต้องผ่านก่อนส่ง Pull Request และ GitHub จะรันเทสต์ทั้งชุดให้อัตโนมัติทุกครั้ง
 - **build ตัวติดตั้ง:** `packaging\build_exe.bat`
 - **กติกา:** ห้ามใช้ Tk จาก thread อื่น, MCP ต้องอ่านอย่างเดียวเป็นค่าเริ่มต้น, ข้อความในโปรแกรมเป็นภาษาอังกฤษ คู่มือแก้ทั้งไทยและอังกฤษ,
