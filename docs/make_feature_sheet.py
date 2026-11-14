@@ -81,7 +81,7 @@ T = {
                  "<b>mbtool-portable.zip</b> - unzip and run, data in one folder (USB stick)",
                  "No Python needed &nbsp;·&nbsp; <b>mbtool-cli.exe selftest</b> checks the PC in 15 s"],
         "status_h": "Verification status",
-        "status": "304 automated tests (34 suites) against simulators and emulated RS-485 lines, plus fault, load and "
+        "status": "{tests} automated tests ({suites} test files) against simulators and emulated RS-485 lines, plus fault, load and "
                   "15-minute soak tests. Not yet tested with real devices: every preset is UNVERIFIED - compare with "
                   "the device display before writing. The .exe is not code-signed (SmartScreen: More info > Run anyway).",
         "flow_h": "Typical workflow on site",
@@ -163,7 +163,7 @@ T = {
                  "<b>mbtool-portable.zip</b> แตกไฟล์แล้วรันได้เลย ข้อมูลอยู่ในโฟลเดอร์เดียว (ใส่ USB ได้)",
                  "ไม่ต้องมี Python &nbsp;·&nbsp; <b>mbtool-cli.exe selftest</b> ตรวจเครื่องใน 15 วินาที"],
         "status_h": "สถานะการตรวจสอบ",
-        "status": "ทดสอบอัตโนมัติ 304 ข้อ (34 ชุด) กับ simulator และสาย RS-485 จำลอง รวมทดสอบความผิดพลาด โหลด และรันยาว 15 นาที "
+        "status": "ทดสอบอัตโนมัติ {tests} ข้อ ({suites} ไฟล์) กับ simulator และสาย RS-485 จำลอง รวมทดสอบความผิดพลาด โหลด และรันยาว 15 นาที "
                   "ยังไม่ได้ทดสอบกับอุปกรณ์จริง preset ทุกไฟล์ยังเป็น UNVERIFIED ให้เทียบกับหน้าจอเครื่องก่อนเขียนค่า "
                   "และ .exe ยังไม่ได้ลงนามดิจิทัล (SmartScreen: More info > Run anyway)",
         "flow_h": "ขั้นตอนใช้งานหน้างานโดยทั่วไป",
@@ -283,9 +283,26 @@ def img_uri(name):
         return "data:image/png;base64," + base64.b64encode(f.read()).decode("ascii")
 
 
+def test_counts():
+    """(number of tests, number of test files) of tests/, counted by pytest itself - never typed by hand."""
+    import re
+    import subprocess
+    root = os.path.dirname(HERE)
+    out = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "tests"], cwd=root,
+                         capture_output=True, text=True, timeout=300).stdout
+    m = re.search(r"(\d+) tests? collected", out)
+    if not m:
+        raise SystemExit("could not count the tests (is pytest installed?): " + out[-500:])
+    files = sorted({line.split("::")[0] for line in out.splitlines() if "::" in line})
+    return int(m.group(1)), len(files)
+
+
 def main():
     import commission
+    tests, suites = test_counts()
+    print(f"{tests} tests in {suites} test files")
     for lang, t in T.items():
+        t = dict(t, status=t["status"].format(tests=tests, suites=suites))
         path = os.path.join(HERE, f"feature-sheet-{lang}.html")
         with open(path, "w", encoding="utf-8") as f:
             f.write(render(t))

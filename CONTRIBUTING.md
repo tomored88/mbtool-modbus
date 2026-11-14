@@ -23,7 +23,7 @@ same [MIT license](LICENSE).
 
 ## Development setup
 
-Windows 10 / 11, Python 3.10 or newer (CI uses 3.13).
+Windows 10 / 11, Python 3.10 or newer (CI tests 3.10 and 3.13).
 
 ```
 git clone https://github.com/tomored88/mbtool-modbus.git
