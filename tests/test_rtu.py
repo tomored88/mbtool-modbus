@@ -66,11 +66,11 @@ class RtuOverVirtualCable(unittest.TestCase):
         m = self.m
         m.t35 = 0.15  # exaggerated so the gap is measurable
         m.read_holding(5, 0, 1)
-        t = time.monotonic()
-        m._last_activity = time.monotonic()
+        t = time.perf_counter()  # same clock as the master (high resolution on every Python version)
+        m._last_activity = time.perf_counter()
         sent = []
         orig = m.ser.write
-        m.ser.write = lambda b: (sent.append(time.monotonic()), orig(b))[1]
+        m.ser.write = lambda b: (sent.append(time.perf_counter()), orig(b))[1]
         m.read_holding(5, 0, 1)
         self.assertGreaterEqual(sent[0] - t, 0.14)
 
