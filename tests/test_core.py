@@ -66,16 +66,25 @@ class Core(unittest.TestCase):
         c = ModbusTcpClient("127.0.0.1", port=s.port)
         try:
             self.assertTrue(c.connect())
-            r = c.read_holding_registers(100, count=3, slave=1)
+            import inspect
+            unit_kw = "device_id" if "device_id" in inspect.signature(c.read_holding_registers).parameters else "slave"
+            r = c.read_holding_registers(100, count=3, **{unit_kw: 1})  # 'slave' up to 3.7, 'device_id' later
             self.assertEqual(list(r.registers), [11, 22, 33])
         finally:
             c.close()
             s.stop()
 
     def test_request_bytes_equal_pymodbus(self):
-        from pymodbus.pdu import register_read_message as rr
-        req = rr.ReadHoldingRegistersRequest(address=107, count=3)
-        self.assertEqual(req.encode(), build_request(3, addr=107, qty=3)[1:])
+        """Same request bytes as pymodbus builds (MBAP frame minus the 7-byte header = the PDU)."""
+        from pymodbus.framer import FramerSocket
+        from pymodbus.pdu import DecodePDU
+        try:
+            from pymodbus.pdu import ReadHoldingRegistersRequest  # 3.8 and later
+        except ImportError:
+            from pymodbus.pdu.register_read_message import ReadHoldingRegistersRequest  # 3.7
+        for addr, qty in ((107, 3), (0, 1), (65535, 1), (40000, 125)):
+            frame = FramerSocket(DecodePDU(False)).buildFrame(ReadHoldingRegistersRequest(address=addr, count=qty))
+            self.assertEqual(frame[7:], build_request(3, addr=addr, qty=qty), (addr, qty))
 
 class Regression(unittest.TestCase):
     def setUp(self):
