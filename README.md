@@ -201,16 +201,57 @@ python tests/test_help.py ; python tests/test_aiassist.py ; python tests/test_he
 
 ## สรุปภาษาไทย
 
-**ดาวน์โหลด:** ต้องการติดตั้ง ใช้ [mbtool-setup.exe](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-setup.exe) ถ้าไม่อยากติดตั้ง ใช้ [mbtool-portable.zip](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-portable.zip) แตกไฟล์แล้วรัน `mbtool.exe` ได้เลย ไฟล์อื่นใน repo นี้เป็นโค้ด ไม่ต้องโหลด
+mbtool คือโปรแกรม Modbus บน Windows ใช้อ่าน เขียน จำลอง และวิเคราะห์อุปกรณ์ Modbus (TCP / RTU / ASCII)
+รวมถึงออกแบบบัส RS-485 ได้ในโปรแกรมเดียว มี MCP server ให้ AI ช่วยวิเคราะห์ได้ ใช้ฟรีและเปิดโค้ด (MIT)
+
+**ดาวน์โหลด (ไม่ต้องมี Python):**
+- ต้องการติดตั้ง ใช้ [**mbtool-setup.exe**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-setup.exe)
+- ไม่อยากติดตั้ง ใช้ [**mbtool-portable.zip**](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-portable.zip) แตกไฟล์แล้วรัน `mbtool.exe` ได้เลย ใส่ USB ได้
+- ไฟล์อื่นใน repo นี้เป็นโค้ด ไม่ต้องโหลด
 
 **เอกสารแนะนำโปรแกรม (feature sheet):** [ภาษาไทย](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-th.pdf) · [English](https://github.com/tomored88/mbtool-modbus/releases/latest/download/mbtool-feature-sheet-en.pdf) (PDF 3 หน้า มีภาพหน้าจอ)
 
-เครื่องมือ Modbus: master (TCP/RTU/ASCII), หน้าต่าง GUI, simulator ของ slave, preset ของอุปกรณ์ 30 รุ่น,
-สแกนค่าการเชื่อมต่ออัตโนมัติ, Test Center และ MCP server ให้ AI อ่านค่าอุปกรณ์
+**Windows เตือนว่าไม่ปลอดภัย:** เป็นเพราะโปรแกรมยังไม่ได้ลงนามดิจิทัล ไม่ได้มีไวรัส (ไฟล์ใน release ผ่านการสแกน
+Microsoft Defender แล้ว) กด **More info** แล้วกด **Run anyway** เตือนแค่ครั้งแรก
 
-- ติดตั้ง: ดับเบิลคลิก `install.bat` แล้วเปิดด้วย `run.bat` (ต้องมี Python 3.10 ขึ้นไป)
+### ภาพหน้าจอ
+
+**หน้าต่างหลัก:** ตารางค่าแบบเรียลไทม์ แสดงทุก register เป็นหลายชนิดข้อมูลพร้อมกัน
+
+![หน้าต่างหลัก](docs/screenshots/main.png)
+
+**หน้าต่าง Devices:** หลายอุปกรณ์บนสาย RS-485 เส้นเดียว แยกแท็บละตัว พร้อมชนิด error และเวลาตอบ
+
+![หน้าต่าง Devices](docs/screenshots/devices.png)
+
+**ทดสอบสุขภาพบัส:** เวลาตอบจริงของแต่ละอุปกรณ์ ค่า timeout / gap ที่แนะนำ และเวลารอบที่คาด
+
+![ทดสอบสุขภาพบัส](docs/screenshots/health.png)
+
+**แผนผังบัส RS-485:** ความยาวสาย terminator และภาพคำขอวิ่งไปหาอุปกรณ์แล้วตอบกลับ
+
+![แผนผังบัส RS-485](docs/screenshots/busmap.png)
+
+ภาพทั้งหมดถ่ายจาก Demo devices ในโปรแกรม (อุปกรณ์จำลอง ไม่ต้องมีฮาร์ดแวร์)
+
+### ทำอะไรได้บ้าง
+
+- **Master:** อ่าน / เขียน FC 01-06, 15, 16, 22, 23 แสดงค่าได้หลายชนิดข้อมูล แท็บ poll หลายชุด ตัวตรวจค่า (F4)
+- **Preset อุปกรณ์ 30 รุ่น:** มิเตอร์ ไดรฟ์ เซนเซอร์ level / pressure / flow แก้ไขและนำเข้าจาก CSV ได้
+- **หลายอุปกรณ์ (F11):** Scan & add, แท็บต่ออุปกรณ์, โหมด PLC cycle วัดเวลารอบ, เครื่องคำนวณเวลารอบ
+- **ทดสอบสุขภาพบัส:** วัดเวลาตอบจริง แยกชนิด error แนะนำ timeout และ gap
+- **แผนผังบัส RS-485 (Ctrl+M):** ความยาวสาย baud ที่แนะนำ unit load และภาพเคลื่อนไหว
+- **Slave จำลอง (F9):** ค่าขยับได้ และจำลองความผิดพลาด (ไม่ตอบ, ตอบช้า, CRC เสีย ฯลฯ)
+- **ส่งข้อมูลออก:** MQTT และ SQLite, บันทึก log CSV, กราฟ Trend, แจ้งเตือน
+- **รายงานส่งมอบงาน:** HTML / PDF ภาษาไทยหรืออังกฤษ
+- **คู่มือในโปรแกรม (F1):** ภาษาไทยและอังกฤษ 85 หัวข้อ
+- **AI (F12):** MCP server ให้ Claude, ChatGPT Desktop และ AI อื่นที่รองรับ MCP อ่านค่าอุปกรณ์ได้
+
+### ข้อควรรู้
+
 - **preset ทุกไฟล์ยังไม่ผ่านการทดสอบกับอุปกรณ์จริง** ต้องเทียบค่ากับหน้าจอเครื่องก่อนใช้งานจริง
 - MCP ปิดการเขียนค่าเป็นค่าเริ่มต้น เปิดได้ด้วยตัวแปร `MBTOOL_ALLOW_WRITE=1` และระบุช่วง address ที่อนุญาตเท่านั้น
+- รันจากโค้ด (สำหรับนักพัฒนา): ดับเบิลคลิก `install.bat` แล้วเปิดด้วย `run.bat` (ต้องมี Python 3.10 ขึ้นไป)
 - ทดสอบ RTU โดยไม่มีฮาร์ดแวร์ได้ด้วย `python src/mbtool.py vcom` (สายจำลองผ่าน TCP)
 
 ## License
